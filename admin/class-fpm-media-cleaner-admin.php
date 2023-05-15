@@ -59,7 +59,29 @@ class Fpm_Media_Cleaner_Admin
     add_action("admin_menu", [$this, "admin_menu"]);
 
     add_action("wp_ajax_media-clean-fill-cache", [$this, "action_fill_cache"]);
+    add_action("wp_ajax_media-clean-remove", [$this, "action_remove"]);
     add_action("wp_ajax_media-clean-get-cache", [$this, "action_get_cache"]);
+    add_action("wp_ajax_media-clean-get-options", [
+      $this,
+      "action_get_options",
+    ]);
+  }
+
+  private function _set_option($key, $value)
+  {
+    $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::OPTIONS_TABLE_NAME;
+    $sql = "INSERT INTO {$table_name} (option_key,option_value) VALUES (%s,%s) ON DUPLICATE KEY UPDATE option_value = %s";
+    $sql = $this->db->prepare($sql, $key, $value, $value);
+    $this->db->query($sql);
+  }
+
+  private function _get_options()
+  {
+    $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::OPTIONS_TABLE_NAME;
+    $sql = "SELECT * FROM {$table_name}";
+    $sql = $this->db->prepare($sql);
+    $results = $this->db->get_results($sql);
+    return $results;
   }
 
   public function action_fill_cache()
@@ -74,22 +96,86 @@ class Fpm_Media_Cleaner_Admin
     $post_table_name = $this->db->prefix . "posts";
     $SQL =
       '
-      SELECT fpm.id, p.post_title, p.post_type, p.post_status, p.post_modified
+      SELECT fpm.id, fpm.post_id, p.post_title, p.post_type, p.post_status, p.post_modified, p.guid
       FROM `' .
       $table_name .
       '` as fpm
-      INNER JOIN `' .
+      LEFT JOIN `' .
       $post_table_name .
-      '` as p ON fpm.ID = p.ID
+      '` as p ON fpm.post_id = p.ID
+      ORDER BY fpm.ID
+      LIMIT 300
     ';
-
-    echo json_encode($not_direct_link);
+    $result = $this->db->get_results($SQL, ARRAY_A);
+    echo json_encode($result);
 
     wp_die();
   }
 
+  public function action_get_options()
+  {
+    $options = $this->_get_options();
+    echo json_encode($options);
+    wp_die();
+  }
+
+  public function action_remove()
+  {
+    $this->_media_remove();
+  }
+
+  private function _media_remove()
+  {
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["STATUS"],
+      "process-remove"
+    );
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
+      date("c")
+    );
+    $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
+    $post_table_name = $this->db->prefix . "posts";
+    $SQL =
+      '
+      SELECT post_id
+      FROM `' .
+      $table_name .
+      '`
+    ';
+    $result = $this->db->get_results($SQL, ARRAY_A);
+    foreach ($result as $row) {
+      wp_delete_attachment($row["post_id"]);
+    }
+    $TRUNCATE_SQL =
+      '
+      TRUNCATE TABLE `' .
+      $table_name .
+      '`
+    ';
+    $this->db->query($TRUNCATE_SQL);
+
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["STATUS"],
+      "finish-remove"
+    );
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
+      date("c")
+    );
+  }
+
   private function _refill_cache_table()
   {
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["STATUS"],
+      "process-cache"
+    );
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
+      date("c")
+    );
+
     $SQL_NOT_DIRECT_LINKED = "
     SELECT p.ID, p.guid
     FROM wp_posts as p
@@ -115,6 +201,8 @@ class Fpm_Media_Cleaner_Admin
     );
     $attachment_not_link = [];
     $place_holders = [];
+
+    $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
 
     foreach ($attachments_not_direct_link as $key => $attachment) {
       $SQL_SEARCH_IN_POST_CONTENT = "
@@ -144,19 +232,24 @@ class Fpm_Media_Cleaner_Admin
           "",
           $attachment["guid"]
         );
-        $attachment_not_link[] = [
+
+        $this->db->insert($table_name, [
           "post_id" => $attachment["ID"],
           "insert_date" => date("Y-m-d H:i:s"),
-        ];
-        $place_holders[] = "('%d', '%s')";
+        ]);
       }
     }
 
-    $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
-    $query = "INSERT INTO `{$table_name}` (post_id, insert_date) VALUES ";
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["STATUS"],
+      "finish-cache"
+    );
 
-    $query .= implode(", ", $place_holders);
-    $wpdb->query($wpdb->prepare("$query ", $attachment_not_link));
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
+      date("c")
+    );
+    // TODO: add count to options for remove process
   }
 
   /**

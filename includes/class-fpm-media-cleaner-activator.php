@@ -36,6 +36,8 @@ class Fpm_Media_Cleaner_Activator
 
     global $wpdb;
     $table_name = $wpdb->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
+    $table_options_name =
+      $wpdb->prefix . MEDIA_CLEANER_CONFIG::OPTIONS_TABLE_NAME;
 
     $wpdb->query(
       '
@@ -46,7 +48,22 @@ class Fpm_Media_Cleaner_Activator
 				`post_id` INT NULL ,
 				`insert_date` DATETIME NULL,
 				PRIMARY KEY (`id`) ,
-				UNIQUE INDEX `id_UNIQUE` (`id` ASC) )
+				UNIQUE INDEX `fpm_id_UNIQUE` (`id` ASC) )
+				UNIQUE (`post_id`)
+			ENGINE = InnoDB
+			DEFAULT CHARACTER SET = utf8
+			COLLATE = utf8_unicode_ci;
+		'
+    );
+    $wpdb->query(
+      '
+			CREATE TABLE IF NOT EXISTS  `' .
+        $table_options_name .
+        '` (
+				`option_key` VARCHAR(255) NOT NULL ,
+				`option_value` VARCHAR(255) NULL ,
+				PRIMARY KEY (`option_key`) ,
+				UNIQUE INDEX `fpm_option_key_UNIQUE` (`option_key` ASC) )
 			ENGINE = InnoDB
 			DEFAULT CHARACTER SET = utf8
 			COLLATE = utf8_unicode_ci;

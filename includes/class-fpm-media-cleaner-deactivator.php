@@ -36,11 +36,19 @@ class Fpm_Media_Cleaner_Deactivator
       "includes/class-fpm-media-cleaner-config.php";
 
     $table_name = $wpdb->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
+    $table_options_name =
+      $wpdb->prefix . MEDIA_CLEANER_CONFIG::OPTIONS_TABLE_NAME;
 
     $wpdb->query(
       '
 			TRUNCATE TABLE `' .
         $table_name .
+        "`"
+    );
+    $wpdb->query(
+      '
+			TRUNCATE TABLE `' .
+        $table_options_name .
         "`"
     );
   }
