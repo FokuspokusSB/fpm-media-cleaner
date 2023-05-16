@@ -9,5 +9,6 @@ class MEDIA_CLEANER_CONFIG
     "STATUS" => "status",
     "LAST_UPDATE" => "last_update",
     "COUNT" => "count",
+    "SKIP_IDS" => "skip_ids",
   ];
 }

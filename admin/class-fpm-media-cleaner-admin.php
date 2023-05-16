@@ -62,6 +62,7 @@ class Fpm_Media_Cleaner_Admin
     add_action("wp_ajax_media-clean-remove", [$this, "action_remove"]);
     add_action("wp_ajax_media-clean-get-cache", [$this, "action_get_cache"]);
     add_action("wp_ajax_media-clean-get-count", [$this, "action_get_count"]);
+    add_action("wp_ajax_media-clean-set-skip", [$this, "action_set_skip"]);
     add_action("wp_ajax_media-clean-get-options", [
       $this,
       "action_get_options",
@@ -85,6 +86,21 @@ class Fpm_Media_Cleaner_Admin
     return $results;
   }
 
+  public function action_set_skip()
+  {
+    $skip_ids = $_POST["ids"];
+    if (!$skip_ids) {
+      wp_die();
+      return;
+    }
+
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["SKIP_IDS"],
+      json_encode($skip_ids)
+    );
+    wp_die();
+  }
+
   public function action_fill_cache()
   {
     $this->_refill_cache_table();
@@ -105,9 +121,14 @@ class Fpm_Media_Cleaner_Admin
       $post_table_name .
       '` as p ON fpm.post_id = p.ID
       ORDER BY fpm.ID
-      LIMIT 300
+      LIMIT 100
     ';
     $result = $this->db->get_results($SQL, ARRAY_A);
+
+    for ($i = 0; $i < sizeof($result); $i++) {
+      $result[$i]["img"] = wp_get_attachment_image_src($result[$i]["post_id"]);
+    }
+
     echo json_encode($result);
 
     wp_die();
@@ -116,6 +137,37 @@ class Fpm_Media_Cleaner_Admin
   public function action_get_options()
   {
     $options = $this->_get_options();
+
+    $skip_ids_index = false;
+    foreach ($options as $i => $option) {
+      if (
+        $option->option_key == MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["SKIP_IDS"]
+      ) {
+        $skip_ids_index = $i;
+        break;
+      }
+    }
+
+    // get skip_ids media infos
+    if ($skip_ids_index) {
+      $options[$skip_ids_index]->option_value = json_decode(
+        $options[$skip_ids_index]->option_value
+      );
+      if (is_array($options[$skip_ids_index]->option_value)) {
+        for (
+          $i = 0;
+          $i < sizeof($options[$skip_ids_index]->option_value);
+          $i++
+        ) {
+          $options[$skip_ids_index]->option_value[
+            $i
+          ] = wp_get_attachment_image_src(
+            $options[$skip_ids_index]->option_value[$i]
+          );
+        }
+      }
+    }
+
     echo json_encode($options);
     wp_die();
   }
@@ -127,7 +179,9 @@ class Fpm_Media_Cleaner_Admin
 
   public function action_get_count()
   {
-    $result = $this->_get_count();
+    $result = [
+      "count" => $this->_get_count(),
+    ];
     echo json_encode($result);
     wp_die();
   }
@@ -165,6 +219,11 @@ class Fpm_Media_Cleaner_Admin
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
       date("c")
     );
+
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["COUNT"],
+      $this->_get_count()
+    );
   }
 
   private function _get_count()
@@ -179,7 +238,7 @@ class Fpm_Media_Cleaner_Admin
       '`
     ';
     $count = $this->db->get_row($SQL, ARRAY_A);
-    return $count["count"] ?: "";
+    return $count["count"] ?: "0";
   }
 
   private function _refill_cache_table()
@@ -193,6 +252,17 @@ class Fpm_Media_Cleaner_Admin
       date("c")
     );
     $this->_set_option(MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["COUNT"], "0");
+
+    $options = $this->_get_options();
+    $skip_ids = false;
+    if ($options[MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["SKIP_IDS"]]) {
+      $skip_ids = json_encode(
+        $options[MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["SKIP_IDS"]]
+      );
+      if (!is_array($skip_ids)) {
+        $skip_ids = false;
+      }
+    }
 
     $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
 
@@ -231,6 +301,9 @@ class Fpm_Media_Cleaner_Admin
     $place_holders = [];
 
     foreach ($attachments_not_direct_link as $key => $attachment) {
+      if ($skip_ids && in_array($attachment["ID"], $skip_ids)) {
+        continue;
+      }
       $SQL_SEARCH_IN_POST_CONTENT = "
         SELECT post_content 
         FROM wp_posts 
@@ -328,6 +401,7 @@ class Fpm_Media_Cleaner_Admin
      * between the defined hooks and the functions defined in this
      * class.
      */
+    wp_enqueue_media();
 
     wp_enqueue_script(
       $this->plugin_name,

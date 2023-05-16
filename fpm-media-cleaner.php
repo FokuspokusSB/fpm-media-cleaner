@@ -9,20 +9,19 @@
  * that starts the plugin.
  *
  * @link              https://fokuspokus-media.de
- * @since             1.0.0
+ * @since             1.0.1
  * @package           Fpm_Media_Cleaner
  *
  * @wordpress-plugin
  * Plugin Name:       FPM Media Cleaner
  * Plugin URI:        https://fokuspokus-media.de
- * Description:       Media Files are checkt if there a still necessary
- * Version:           1.0.0
+ * Description:       Removed unnecessary Media Files
+ * Version:           1.0.1
  * Author:            Sören
  * Author URI:        https://fokuspokus-media.de
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * License:           Copyright
  * Text Domain:       fpm-media-cleaner
- * Domain Path:       /languages
+ * Domain Path:       /
  */
 
 // If this file is called directly, abort.
