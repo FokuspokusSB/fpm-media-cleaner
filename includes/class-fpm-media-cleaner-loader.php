@@ -3,7 +3,7 @@
 /**
  * Register all actions and filters for the plugin
  *
- * @link       https://samyblake.ninja
+ * @link       https://fokuspokus-media.de
  * @since      1.0.0
  *
  * @package    Fpm_Media_Cleaner

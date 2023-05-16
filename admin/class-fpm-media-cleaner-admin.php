@@ -5,7 +5,7 @@ require_once plugin_dir_path(dirname(__FILE__)) .
 /**
  * The admin-specific functionality of the plugin.
  *
- * @link       https://samyblake.ninja
+ * @link       https://fokuspokus-media.de
  * @since      1.0.0
  *
  * @package    Fpm_Media_Cleaner
@@ -61,6 +61,7 @@ class Fpm_Media_Cleaner_Admin
     add_action("wp_ajax_media-clean-fill-cache", [$this, "action_fill_cache"]);
     add_action("wp_ajax_media-clean-remove", [$this, "action_remove"]);
     add_action("wp_ajax_media-clean-get-cache", [$this, "action_get_cache"]);
+    add_action("wp_ajax_media-clean-get-count", [$this, "action_get_count"]);
     add_action("wp_ajax_media-clean-get-options", [
       $this,
       "action_get_options",
@@ -124,6 +125,13 @@ class Fpm_Media_Cleaner_Admin
     $this->_media_remove();
   }
 
+  public function action_get_count()
+  {
+    $result = $this->_get_count();
+    echo json_encode($result);
+    wp_die();
+  }
+
   private function _media_remove()
   {
     $this->_set_option(
@@ -138,7 +146,7 @@ class Fpm_Media_Cleaner_Admin
     $post_table_name = $this->db->prefix . "posts";
     $SQL =
       '
-      SELECT post_id
+      SELECT id, post_id
       FROM `' .
       $table_name .
       '`
@@ -146,14 +154,8 @@ class Fpm_Media_Cleaner_Admin
     $result = $this->db->get_results($SQL, ARRAY_A);
     foreach ($result as $row) {
       wp_delete_attachment($row["post_id"]);
+      $this->db->delete($table_name, ["id" => $row["id"]]);
     }
-    $TRUNCATE_SQL =
-      '
-      TRUNCATE TABLE `' .
-      $table_name .
-      '`
-    ';
-    $this->db->query($TRUNCATE_SQL);
 
     $this->_set_option(
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["STATUS"],
@@ -163,6 +165,21 @@ class Fpm_Media_Cleaner_Admin
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
       date("c")
     );
+  }
+
+  private function _get_count()
+  {
+    $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
+
+    $SQL =
+      '
+      SELECT COUNT(*) as count
+      FROM `' .
+      $table_name .
+      '`
+    ';
+    $count = $this->db->get_row($SQL, ARRAY_A);
+    return $count["count"] ?: "";
   }
 
   private function _refill_cache_table()
@@ -175,6 +192,17 @@ class Fpm_Media_Cleaner_Admin
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
       date("c")
     );
+    $this->_set_option(MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["COUNT"], "0");
+
+    $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
+
+    $TRUNCATE_SQL =
+      '
+      TRUNCATE TABLE `' .
+      $table_name .
+      '`
+    ';
+    $this->db->query($TRUNCATE_SQL);
 
     $SQL_NOT_DIRECT_LINKED = "
     SELECT p.ID, p.guid
@@ -201,8 +229,6 @@ class Fpm_Media_Cleaner_Admin
     );
     $attachment_not_link = [];
     $place_holders = [];
-
-    $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
 
     foreach ($attachments_not_direct_link as $key => $attachment) {
       $SQL_SEARCH_IN_POST_CONTENT = "
@@ -249,7 +275,11 @@ class Fpm_Media_Cleaner_Admin
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
       date("c")
     );
-    // TODO: add count to options for remove process
+
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["COUNT"],
+      $this->_get_count()
+    );
   }
 
   /**

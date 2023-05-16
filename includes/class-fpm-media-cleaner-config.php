@@ -8,5 +8,6 @@ class MEDIA_CLEANER_CONFIG
   const OPTIONS_KEYS = [
     "STATUS" => "status",
     "LAST_UPDATE" => "last_update",
+    "COUNT" => "count",
   ];
 }

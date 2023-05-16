@@ -8,7 +8,7 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              https://samyblake.ninja
+ * @link              https://fokuspokus-media.de
  * @since             1.0.0
  * @package           Fpm_Media_Cleaner
  *
@@ -18,7 +18,7 @@
  * Description:       Media Files are checkt if there a still necessary
  * Version:           1.0.0
  * Author:            Sören
- * Author URI:        https://samyblake.ninja
+ * Author URI:        https://fokuspokus-media.de
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       fpm-media-cleaner

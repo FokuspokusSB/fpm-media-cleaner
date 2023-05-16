@@ -4,7 +4,7 @@
  *
  * This file is used to markup the admin-facing aspects of the plugin.
  *
- * @link       https://samyblake.ninja
+ * @link       https://fokuspokus-media.de
  * @since      1.0.0
  *
  * @package    Fpm_Media_Cleaner
@@ -25,30 +25,56 @@
       <th>
         Last Update
       </th>
+      <th>
+        Last Update Anzahl
+      </th>
     </tr>
     <tr>
       <td>
-        <span data-options-status=""></span>
+        <span data-options-status="">
+          --
+        </span>
       </td>
       <td>
-        <span data-options-last-update=""></span>
+        <span data-options-last-update="">
+          --
+        </span>
+      </td>
+      <td>
+        <span data-options-count="">
+          --
+        </span>
       </td>
     </tr>
   </table>
-  <div>
-    <button type="button" data-fpm-media-cleaner-refresh="">
-      REFRESH
-    </button>
+  <div class="controls">
+    <div>
+      <button type="button" data-fpm-media-cleaner-refresh="">
+        Cache Tabelle füllen/aktualisieren
+      </button>
 
-    <button type="button" data-fpm-media-cleaner-remove="">
-      Purge
-    </button>
+      <button type="button" data-fpm-media-cleaner-remove="">
+        Media Dateien löschen
+      </button>
+    </div>
+
+    <span>
+      Aktuelle Anzahl: 
+      <span data-fpm-media-cleaner-count="">
+      </span>
+    </span>
+  </div>
+
+  <div class="progressbar">
+    <progress data-fpm-media-progress="">
+    </progress>
 
   </div>
+
   <table data-clean-media="">
     <thead>
       <tr>
-        <th>
+        <th style="width: 50px;">
           ID
         </th>
         <th>
@@ -57,13 +83,13 @@
         <th>
           post_modified
         </th>
-        <th>
+        <th style="width: 80px;">
           post_status
         </th>
         <th>
           post_title
         </th>
-        <th>
+        <th style="width: 70px;">
           post_type
         </th>
       </tr>

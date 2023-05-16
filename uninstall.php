@@ -19,13 +19,13 @@
  * For more information, see the following discussion:
  * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
  *
- * @link       https://samyblake.ninja
+ * @link       https://fokuspokus-media.de
  * @since      1.0.0
  *
  * @package    Fpm_Media_Cleaner
  */
 
 // If uninstall not called from WordPress, then exit.
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	exit;
+if (!defined("WP_UNINSTALL_PLUGIN")) {
+  exit();
 }

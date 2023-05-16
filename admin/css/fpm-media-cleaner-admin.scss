@@ -3,6 +3,7 @@
 
   table {
     width: 100%;
+    table-layout: fixed;
 
     th {
       text-align: left;
@@ -13,9 +14,38 @@
     }
 
     td {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
       img {
         width: 150px;
       }
+    }
+  }
+
+  .controls {
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+
+    button {
+      &:first-child {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .progressbar {
+    display: none;
+    padding: 20px 0;
+
+    &.show {
+      display: block;
+    }
+
+    progress {
+      width: 100%;
     }
   }
 }

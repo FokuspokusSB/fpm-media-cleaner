@@ -3,6 +3,7 @@
 }
 .m-fpm-media-cleaner table {
   width: 100%;
+  table-layout: fixed;
 }
 .m-fpm-media-cleaner table th {
   text-align: left;
@@ -11,6 +12,29 @@
 .m-fpm-media-cleaner table td {
   padding: 10px;
 }
+.m-fpm-media-cleaner table td {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 .m-fpm-media-cleaner table td img {
   width: 150px;
+}
+.m-fpm-media-cleaner .controls {
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+}
+.m-fpm-media-cleaner .controls button:first-child {
+  margin-right: 10px;
+}
+.m-fpm-media-cleaner .progressbar {
+  display: none;
+  padding: 20px 0;
+}
+.m-fpm-media-cleaner .progressbar.show {
+  display: block;
+}
+.m-fpm-media-cleaner .progressbar progress {
+  width: 100%;
 }

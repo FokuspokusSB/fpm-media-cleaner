@@ -27,6 +27,11 @@
     return {
       status: document.querySelector("[data-options-status]"),
       lastUpdate: document.querySelector("[data-options-last-update]"),
+      count: document.querySelector("[data-options-count]"),
+      progress: document.querySelector("[data-fpm-media-progress]"),
+      refreshBtn: document.querySelector("[data-fpm-media-cleaner-refresh]"),
+      purgeBtn: document.querySelector("[data-fpm-media-cleaner-remove]"),
+      activeCount: document.querySelector("[data-fpm-media-cleaner-count]"),
     };
   }
 
@@ -36,12 +41,73 @@
     return td;
   }
 
+  function getCount() {
+    const elements = getTemplateElements();
+    request("media-clean-get-count", {})
+      .done(function (response) {
+        elements.activeCount.innerHTML = response;
+        const allCounts = Number.parseInt(elements.count.innerHTML);
+        const count = Number.parseInt(response);
+
+        if (!Number.isNaN(allCounts) && !Number.isNaN(count)) {
+          elements.progress.setAttribute("max", allCounts);
+          elements.progress.setAttribute("value", allCounts - count);
+        } else {
+          elements.progress.removeAttribute("max");
+          elements.progress.removeAttribute("value");
+        }
+      })
+      .fail(function () {
+        console.error("error");
+      });
+  }
+
+  function getOptions() {
+    const templateElements = getTemplateElements();
+
+    request("media-clean-get-options", {})
+      .done(function (response) {
+        for (const option of response) {
+          switch (option.option_key) {
+            case "status":
+              templateElements.status.innerHTML = option.option_value;
+              if (option.option_value.startsWith("process")) {
+                templateElements.progress.parentNode.classList.add("show");
+                templateElements.refreshBtn.setAttribute("disabled", "");
+                templateElements.purgeBtn.setAttribute("disabled", "");
+              }
+              if (option.option_value.startsWith("finish")) {
+                templateElements.progress.parentNode.classList.remove("show");
+                templateElements.refreshBtn.removeAttribute("disabled");
+                templateElements.purgeBtn.removeAttribute("disabled");
+              }
+              break;
+            case "last_update":
+              const date = new Date(option.option_value);
+              templateElements.lastUpdate.innerHTML = date.toString();
+              break;
+            case "count":
+              templateElements.count.innerHTML = option.option_value;
+              break;
+          }
+        }
+      })
+      .fail(function () {
+        console.error("error");
+      });
+  }
+
   function initPanel() {
     const panel = document.querySelector("[data-fpm-media-cleaner]");
     if (!panel) {
       return;
     }
-    const templateElements = getTemplateElements();
+
+    setInterval(getCount, 5000);
+    setInterval(getOptions, 5000);
+    getCount();
+    getOptions();
+
     request("media-clean-get-cache", {})
       .done(function (response) {
         const table = document.querySelector("[data-clean-media]");
@@ -62,23 +128,6 @@
           tr.appendChild(createDataTableTd(row.post_title));
           tr.appendChild(createDataTableTd(row.post_type));
           tbody.appendChild(tr);
-        }
-      })
-      .fail(function () {
-        console.error("error");
-      });
-
-    request("media-clean-get-options", {})
-      .done(function (response) {
-        for (const option of response) {
-          switch (option.option_key) {
-            case "status":
-              templateElements.status.innerHTML = option.option_value;
-              break;
-            case "last_update":
-              templateElements.lastUpdate.innerHTML = option.option_value;
-              break;
-          }
         }
       })
       .fail(function () {

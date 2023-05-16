@@ -3,7 +3,7 @@
 /**
  * Fired during plugin deactivation
  *
- * @link       https://samyblake.ninja
+ * @link       https://fokuspokus-media.de
  * @since      1.0.0
  *
  * @package    Fpm_Media_Cleaner
@@ -41,13 +41,13 @@ class Fpm_Media_Cleaner_Deactivator
 
     $wpdb->query(
       '
-			TRUNCATE TABLE `' .
+			DROP TABLE `' .
         $table_name .
         "`"
     );
     $wpdb->query(
       '
-			TRUNCATE TABLE `' .
+			DROP TABLE `' .
         $table_options_name .
         "`"
     );

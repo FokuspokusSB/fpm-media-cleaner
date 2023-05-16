@@ -3,7 +3,7 @@
 /**
  * Fired during plugin activation
  *
- * @link       https://samyblake.ninja
+ * @link       https://fokuspokus-media.de
  * @since      1.0.0
  *
  * @package    Fpm_Media_Cleaner
@@ -48,8 +48,8 @@ class Fpm_Media_Cleaner_Activator
 				`post_id` INT NULL ,
 				`insert_date` DATETIME NULL,
 				PRIMARY KEY (`id`) ,
-				UNIQUE INDEX `fpm_id_UNIQUE` (`id` ASC) )
-				UNIQUE (`post_id`)
+				UNIQUE INDEX `fpm_id_UNIQUE` (`id` ASC),
+				UNIQUE (`post_id`) )
 			ENGINE = InnoDB
 			DEFAULT CHARACTER SET = utf8
 			COLLATE = utf8_unicode_ci;
