@@ -168,8 +168,8 @@
           for (const row of response) {
             const tr = document.createElement("tr");
             tr.appendChild(createDataTableTd(row.id));
-            // tr.appendChild(createDataTableTd(createImg(row.img[0])));
-            tr.appendChild(createDataTableTd(row.img[0]));
+            tr.appendChild(createDataTableTd(createImg(row.img[0])));
+            // tr.appendChild(createDataTableTd(row.img[0]));
             const modified = new Date(row.post_modified);
             tr.appendChild(createDataTableTd(row.post_title));
             const lastTd = createDataTableTd(formatDate(modified));
