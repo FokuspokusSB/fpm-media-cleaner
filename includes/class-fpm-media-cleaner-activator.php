@@ -1,5 +1,7 @@
 <?php
 
+require_once plugin_dir_path(dirname(__FILE__)) .
+  "includes/class-fpm-media-cleaner-config.php";
 /**
  * Fired during plugin activation
  *
@@ -31,9 +33,6 @@ class Fpm_Media_Cleaner_Activator
    */
   public static function activate()
   {
-    require_once plugin_dir_path(dirname(__FILE__)) .
-      "includes/class-fpm-media-cleaner-config.php";
-
     global $wpdb;
     $table_name = $wpdb->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
     $table_options_name =
@@ -69,5 +68,29 @@ class Fpm_Media_Cleaner_Activator
 			COLLATE = utf8_unicode_ci;
 		'
     );
+    self::_set_default_config();
+  }
+
+  private static function _set_default_config()
+  {
+    self::_set_option(MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["STATUS"], "init");
+    self::_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
+      date("c")
+    );
+    self::_set_option(MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["COUNT"], 0);
+    self::_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["SKIP_IDS"],
+      json_encode([])
+    );
+  }
+
+  private static function _set_option($key, $value)
+  {
+    global $wpdb;
+    $table_name = $wpdb->prefix . MEDIA_CLEANER_CONFIG::OPTIONS_TABLE_NAME;
+    $sql = "INSERT INTO {$table_name} (option_key,option_value) VALUES (%s,%s) ON DUPLICATE KEY UPDATE option_value = %s";
+    $sql = $wpdb->prepare($sql, $key, $value, $value);
+    $wpdb->query($sql);
   }
 }

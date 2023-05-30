@@ -9,19 +9,19 @@
  * that starts the plugin.
  *
  * @link              https://fokuspokus-media.de
- * @since             1.0.1
+ * @since             1.0.2
  * @package           Fpm_Media_Cleaner
  *
  * @wordpress-plugin
  * Plugin Name:       FPM Media Cleaner
  * Plugin URI:        https://fokuspokus-media.de
  * Description:       Removed unnecessary Media Files
- * Version:           1.0.1
- * Author:            Sören
+ * Version:           1.0.2
+ * Author:            Sören Balke
  * Author URI:        https://fokuspokus-media.de
  * License:           Copyright
  * Text Domain:       fpm-media-cleaner
- * Domain Path:       /
+ * Domain Path:       /languages
  */
 
 // If this file is called directly, abort.
@@ -34,7 +34,7 @@ if (!defined("WPINC")) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define("FPM_MEDIA_CLEANER_VERSION", "1.0.0");
+define("FPM_MEDIA_CLEANER_VERSION", "1.0.2");
 
 /**
  * The code that runs during plugin activation.

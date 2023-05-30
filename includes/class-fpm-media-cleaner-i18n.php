@@ -33,10 +33,7 @@ class Fpm_Media_Cleaner_i18n
    */
   public function load_plugin_textdomain()
   {
-    load_plugin_textdomain(
-      "fpm-media-cleaner",
-      false,
-      dirname(dirname(plugin_basename(__FILE__))) . "/languages/"
-    );
+    $folder = basename(realpath(dirname(__FILE__) . "/..")) . "/languages/";
+    load_plugin_textdomain("fpm-media-cleaner", false, $folder);
   }
 }

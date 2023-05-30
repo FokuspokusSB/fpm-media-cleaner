@@ -2,6 +2,23 @@
 
 require_once plugin_dir_path(dirname(__FILE__)) .
   "includes/class-fpm-media-cleaner-config.php";
+
+function buildTree(array $elements, $parentId = 0)
+{
+  $branch = [];
+
+  foreach ($elements as $element) {
+    if ((string) $element["parent"] === (string) $parentId) {
+      $children = buildTree($elements, $element["id"]);
+      if ($children) {
+        $element["children"] = $children;
+      }
+      $branch[] = $element;
+    }
+  }
+
+  return $branch;
+}
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -67,6 +84,10 @@ class Fpm_Media_Cleaner_Admin
       $this,
       "action_get_options",
     ]);
+    add_action("wp_ajax_media-clean-get-filebird-folders", [
+      $this,
+      "action_get_filebird_folders",
+    ]);
   }
 
   private function _set_option($key, $value)
@@ -84,6 +105,23 @@ class Fpm_Media_Cleaner_Admin
     $sql = $this->db->prepare($sql);
     $results = $this->db->get_results($sql);
     return $results;
+  }
+
+  public function action_get_filebird_folders()
+  {
+    $fbv_table_name = $this->db->prefix . "fbv";
+    $SQL =
+      '
+      SELECT *
+      FROM `' .
+      $fbv_table_name .
+      '`
+    ';
+    $query_result = $this->db->get_results($SQL, ARRAY_A);
+    $result = buildTree($query_result);
+
+    echo json_encode($result);
+    wp_die();
   }
 
   public function action_set_skip()
@@ -326,11 +364,11 @@ class Fpm_Media_Cleaner_Admin
         sizeof($options_content_result) == 0
       ) {
         // is not in post_content
-        $attachment["guid"] = str_replace(
-          "http://kinedo.local/wp-content/uploads/",
-          "",
-          $attachment["guid"]
-        );
+        // $attachment["guid"] = str_replace(
+        //   "http://kinedo.local/wp-content/uploads/",
+        //   "",
+        //   $attachment["guid"]
+        // );
 
         $this->db->insert($table_name, [
           "post_id" => $attachment["ID"],
@@ -406,10 +444,12 @@ class Fpm_Media_Cleaner_Admin
     wp_enqueue_script(
       $this->plugin_name,
       plugin_dir_url(__FILE__) . "js/fpm-media-cleaner-admin.js",
-      ["jquery"],
+      ["jquery", "jquery-ui-dialog"],
       $this->version,
       false
     );
+
+    wp_enqueue_style("wp-jquery-ui-dialog");
   }
 
   public function admin_menu()
@@ -419,12 +459,24 @@ class Fpm_Media_Cleaner_Admin
       "FPM Media Cleaner",
       "publish_pages",
       "fpm-media-cleaner",
-      [$this, "admin_page"]
+      [$this, "admin_page"],
+      "dashicons-trash"
     );
   }
 
   public function admin_page()
   {
+    $activate_plugins = (array) get_option("active_plugins", []);
+
+    $external_plugins = [
+      "filebird" => false,
+    ];
+    foreach ($activate_plugins as $value) {
+      if (str_contains($value, "filebird")) {
+        $external_plugins["filebird"] = true;
+      }
+    }
+
     require_once plugin_dir_path(dirname(__FILE__)) .
       "admin/partials/fpm-media-cleaner-admin-display.php";
   }

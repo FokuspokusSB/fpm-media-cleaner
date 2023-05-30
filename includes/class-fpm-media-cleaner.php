@@ -76,7 +76,7 @@ class Fpm_Media_Cleaner
     $this->plugin_name = "fpm-media-cleaner";
 
     $this->load_dependencies();
-    // $this->set_locale();
+    $this->set_locale();
     $this->define_admin_hooks();
     // $this->define_public_hooks();
   }
@@ -110,7 +110,8 @@ class Fpm_Media_Cleaner
      * The class responsible for defining internationalization functionality
      * of the plugin.
      */
-    // require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-fpm-media-cleaner-i18n.php';
+    require_once plugin_dir_path(dirname(__FILE__)) .
+      "includes/class-fpm-media-cleaner-i18n.php";
 
     /**
      * The class responsible for defining all actions that occur in the admin area.
@@ -137,16 +138,16 @@ class Fpm_Media_Cleaner
    * @since    1.0.0
    * @access   private
    */
-  // private function set_locale()
-  // {
-  //   $plugin_i18n = new Fpm_Media_Cleaner_i18n();
+  private function set_locale()
+  {
+    $plugin_i18n = new Fpm_Media_Cleaner_i18n();
 
-  //   $this->loader->add_action(
-  //     "plugins_loaded",
-  //     $plugin_i18n,
-  //     "load_plugin_textdomain"
-  //   );
-  // }
+    $this->loader->add_action(
+      "plugins_loaded",
+      $plugin_i18n,
+      "load_plugin_textdomain"
+    );
+  }
 
   /**
    * Register all of the hooks related to the admin area functionality

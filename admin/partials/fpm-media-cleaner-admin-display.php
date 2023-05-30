@@ -15,19 +15,19 @@
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
 <section class="m-fpm-media-cleaner" data-fpm-media-cleaner="">
   <h1>
-    FPM Media Cleaner
+    <?php esc_html_e("FPM Media Cleaner", "fpm-media-cleaner"); ?>
   </h1>
   <table>
     <thead>
       <tr>
         <th>
-          Status
+          <?php esc_html_e("Status", "fpm-media-cleaner"); ?>
         </th>
         <th>
-          Last Update
+          <?php esc_html_e("Last Update", "fpm-media-cleaner"); ?>
         </th>
         <th>
-          Last Update Anzahl
+          <?php esc_html_e("Last Update Count", "fpm-media-cleaner"); ?>
         </th>
       </tr>
     </thead>
@@ -56,9 +56,12 @@
     <thead>
       <tr>
         <th>
-          Skip Bilder
+          <?php esc_html_e("Skip Images", "fpm-media-cleaner"); ?>
         </th>
-        <th style="width:30px;">
+        <th style="width:64px;">
+          <button type="button" data-add-skip-images="" class="icon">
+            <svg fill="white" xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 -960 960 960" width="48"><path d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h279v60H180v600h600v-279h60v279q0 24-18 42t-42 18H180Zm202-219-42-43 398-398H519v-60h321v321h-60v-218L382-339Z"/></svg>
+          </button>
           <button type="button" data-fpm-media-cleaner-clear-skip="" class="icon">
             <svg fill="white" xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 96 960 960" width="48"><path d="M261 936q-24.75 0-42.375-17.625T201 876V306h-41v-60h188v-30h264v30h188v60h-41v570q0 24-18 42t-42 18H261Zm438-630H261v570h438V306ZM367 790h60V391h-60v399Zm166 0h60V391h-60v399ZM261 306v570-570Z"/></svg>
           </button>
@@ -76,23 +79,49 @@
     </tbody>
   </table>
 
+  <?php if ($external_plugins["filebird"]): ?>
+    <table data-init-filebird="">
+      <thead>
+        <tr>
+          <th>
+            <?php esc_html_e("Skip Filebird Folder", "fpm-media-cleaner"); ?>
+          </th>
+          <th style="width:64px;">
+            <button type="button" data-select-filebird-folder="" class="icon">
+              <svg fill="white" xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 -960 960 960" width="48"><path d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h279v60H180v600h600v-279h60v279q0 24-18 42t-42 18H180Zm202-219-42-43 398-398H519v-60h321v321h-60v-218L382-339Z"/></svg>
+            </button>
+            <button type="button" data-clear-filebird-folder="" class="icon">
+              <svg fill="white" xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 96 960 960" width="48"><path d="M261 936q-24.75 0-42.375-17.625T201 876V306h-41v-60h188v-30h264v30h188v60h-41v570q0 24-18 42t-42 18H261Zm438-630H261v570h438V306ZM367 790h60V391h-60v399Zm166 0h60V391h-60v399ZM261 306v570-570Z"/></svg>
+            </button>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="2">
+            <span data-options-skip-filebird-folder="">
+              <div class="loading"><div></div><div></div><div></div><div></div></div>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  <?php endif; ?>
+
   <div class="controls">
     <div>
-      <button type="button" data-add-skip-images="">
-        Skip Bilder auswählen
-      </button>
-
       <button type="button" data-fpm-media-cleaner-refresh="">
-        Cache Tabelle füllen/aktualisieren
+        <?php esc_html_e("Fill/Update Cache Table", "fpm-media-cleaner"); ?>
       </button>
 
       <button type="button" data-fpm-media-cleaner-remove="" class="warn">
-        Media Dateien löschen
+        <?php esc_html_e("Delete Media Files", "fpm-media-cleaner"); ?>
       </button>
     </div>
 
     <span>
-      Aktuelle Anzahl: 
+      <?php esc_html_e("Current Count:", "fpm-media-cleaner"); ?>
       <strong>
         <span data-fpm-media-cleaner-count="">
           <div class="loading"><div></div><div></div><div></div><div></div></div>
@@ -110,16 +139,16 @@
     <thead>
       <tr>
         <th style="width: 50px;">
-          ID
+          <?php esc_html_e("ID", "fpm-media-cleaner"); ?>
         </th>
         <th style="width: 70px;">
-          Bild
+          <?php esc_html_e("Image", "fpm-media-cleaner"); ?>
         </th>
         <th style="width: auto">
-          Titel
+          <?php esc_html_e("Title", "fpm-media-cleaner"); ?>
         </th>
         <th style="width: 85px;">
-          aktualisiert am
+          <?php esc_html_e("Updated on", "fpm-media-cleaner"); ?>
         </th>
         <th style="width: 30px;">
           <button type="button" class="icon" data-refresh-cash="">
@@ -136,4 +165,23 @@
       </tr>
     </tbody>
   </table>
+
+  <script type="application/json" data-js-translations="">
+    <?php echo json_encode([
+      "Skip Images Select" => __("Skip Images Select", "fpm-media-cleaner"),
+      "select" => __("select", "fpm-media-cleaner"),
+      "Do you want to delete the pictures?" => __(
+        "Do you want to delete the pictures?",
+        "fpm-media-cleaner"
+      ),
+      "No data available." => __("No data available.", "fpm-media-cleaner"),
+      "Select Filebird Folder" => __(
+        "Select Filebird Folder",
+        "fpm-media-cleaner"
+      ),
+    ]); ?>
+  </script>
+
+
+
 </section>

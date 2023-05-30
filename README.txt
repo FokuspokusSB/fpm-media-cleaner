@@ -11,3 +11,13 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 == Description ==
 
 Removed unused media files.
+
+== Language Compile ==
+
+```
+$ # create pot file:
+$ wp i18n make-pot . languages/fpm-media-cleaner.pot
+$ 
+$ cd ./languages
+$ for file in `find . -name "*.po"` ; do msgfmt -o ${file/.po/.mo} $file ; done
+```
