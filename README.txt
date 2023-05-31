@@ -16,8 +16,7 @@ Removed unused media files.
 
 ```
 $ # create pot file:
-$ wp i18n make-pot . languages/fpm-media-cleaner.pot
-$ 
+$ wp i18n make-pot --path=../../ . ./languages/fpm-media-cleaner.pot
 $ cd ./languages
 $ for file in `find . -name "*.po"` ; do msgfmt -o ${file/.po/.mo} $file ; done
 ```

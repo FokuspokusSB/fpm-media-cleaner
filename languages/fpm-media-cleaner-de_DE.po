@@ -3,9 +3,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: FPM Media Cleaner 1.0.1\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/fpm-media-cleaner\n"
-"POT-Creation-Date: 2023-05-30T12:48:27+00:00\n"
-"PO-Revision-Date: 2023-05-30 15:07+0200\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/fpm-media-"
+"cleaner\n"
+"POT-Creation-Date: 2023-05-31T14:05:42+00:00\n"
+"PO-Revision-Date: 2023-05-31 16:17+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -49,34 +50,67 @@ msgstr "Anzahl der letzten Aktualisierungen"
 msgid "Skip Images"
 msgstr "Bilder überspringen"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:82
-msgid "Select Skip Images"
-msgstr "Bilder zum Überspringen auswählen"
+#: admin/partials/fpm-media-cleaner-admin-display.php:87
+msgid "Skip Filebird Folder"
+msgstr "Überspringe Filebird Order"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:86
+#: admin/partials/fpm-media-cleaner-admin-display.php:112
 msgid "Fill/Update Cache Table"
 msgstr "Cache-Tabelle füllen/aktualisieren"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:90
+#: admin/partials/fpm-media-cleaner-admin-display.php:116
 msgid "Delete Media Files"
 msgstr "Mediendateien löschen"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:95
+#: admin/partials/fpm-media-cleaner-admin-display.php:121
 msgid "Current Count:"
 msgstr "Aktuelle Anzahl:"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:113
+#: admin/partials/fpm-media-cleaner-admin-display.php:139
 msgid "ID"
 msgstr "ID"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:116
+#: admin/partials/fpm-media-cleaner-admin-display.php:142
 msgid "Image"
 msgstr "Bild"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:119
+#: admin/partials/fpm-media-cleaner-admin-display.php:145
 msgid "Title"
 msgstr "Titel"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:122
+#: admin/partials/fpm-media-cleaner-admin-display.php:148
 msgid "Updated on"
 msgstr "Aktualisiert am"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:168
+#, fuzzy
+#| msgid "Skip Images"
+msgid "Skip Images Select"
+msgstr "Bilder überspringen"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:169
+msgid "select"
+msgstr "auswahl"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:170
+msgid "Do you want to delete the pictures?"
+msgstr "Möchtest du die Bilder löschen?"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:174
+msgid "No data available."
+msgstr "Keine Daten verfügbar."
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:175
+msgid "Select Filebird Folder"
+msgstr "Wähle Fildbird Order"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:179
+msgid "Close"
+msgstr "Schließen"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:180
+msgid "Save"
+msgstr "Speichern"
+
+#~ msgid "Select Skip Images"
+#~ msgstr "Bilder zum Überspringen auswählen"
