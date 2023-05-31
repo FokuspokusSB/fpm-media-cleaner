@@ -10,5 +10,6 @@ class MEDIA_CLEANER_CONFIG
     "LAST_UPDATE" => "last_update",
     "COUNT" => "count",
     "SKIP_IDS" => "skip_ids",
+    "EXTERNAL_PLUGIN_FILEBIRD_IDS" => "external_plugin_filebird_ids",
   ];
 }

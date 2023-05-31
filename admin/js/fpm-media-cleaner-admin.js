@@ -10,6 +10,10 @@
     console[type](`----------------------------------`);
   }
 
+  function getLoadingElementString() {
+    return '<div class="loading"><div></div><div></div><div></div><div></div></div>';
+  }
+
   function formatDate(inputDate) {
     let hour, minutes, date, month, year;
     hour = inputDate.getHours();
@@ -46,7 +50,6 @@
       lastUpdate: ROOT_DOCUMENT.querySelector("[data-options-last-update]"),
       count: ROOT_DOCUMENT.querySelector("[data-options-count]"),
       skipImages: ROOT_DOCUMENT.querySelector("[data-options-skip-image]"),
-
       skipFilebirdFolder: ROOT_DOCUMENT.querySelector(
         "[data-options-skip-filebird-folder]"
       ),
@@ -76,6 +79,69 @@
     const img = document.createElement("img");
     img.src = value;
     return img;
+  }
+
+  function createSkipImg(value) {
+    const skipImage = document.createElement("span");
+    skipImage.setAttribute("data-id", value.id);
+    skipImage.classList.add("skip-image");
+    skipImage.appendChild(createImg(value.src));
+    const removeElement = document.createElement("button");
+    removeElement.addEventListener("click", function () {
+      removeSingleSkipImage(value.id);
+    });
+    removeElement.classList.add("remove");
+    const icon = document.createElement("i");
+    icon.className = "wp-menu-image dashicons-before dashicons-trash";
+    removeElement.appendChild(icon);
+    skipImage.appendChild(removeElement);
+    return skipImage;
+  }
+
+  function removeSingleSkipImage(id) {
+    const templateElements = getTemplateElements();
+    let ids = templateElements.skipImages.getAttribute("data-ids");
+    if (!ids) {
+      return;
+    }
+    try {
+      ids = JSON.parse(ids).map((v) => v.id);
+    } catch (e) {
+      console.error(e);
+      return;
+    }
+
+    const removeIndex = ids.indexOf(id);
+    if (removeIndex >= 0) {
+      ids.splice(removeIndex, 1);
+      if (ids.length === 0) {
+        ids = false;
+      }
+      request("media-clean-set-skip", { ids }).done(function (response) {
+        const template = getTemplateElements();
+        template.skipImages.innerHTML = "";
+        getOptions();
+      });
+    }
+  }
+
+  function createChip(value) {
+    const chip = document.createElement("span");
+    chip.classList.add("chip");
+    const i = document.createElement("i");
+    i.className = "wp-menu-image dashicons-before dashicons-open-folder";
+    chip.appendChild(i);
+    const textSpan = document.createElement("span");
+    textSpan.innerHTML = value.name;
+    chip.appendChild(textSpan);
+    if (value.count) {
+      const countSpan = document.createElement("span");
+      countSpan.classList.add("count");
+      countSpan.innerHTML = value.count;
+      chip.appendChild(countSpan);
+    }
+    chip.setAttribute("data-id", value.id);
+    return chip;
   }
 
   function getCount() {
@@ -137,11 +203,64 @@
               }
               printedImages = printedImages.map((v) => v.src);
               if (Array.isArray(option.option_value)) {
+                templateElements.skipImages.setAttribute(
+                  "data-ids",
+                  JSON.stringify(option.option_value)
+                );
                 for (const image of option.option_value) {
-                  if (!printedImages.includes(image[0])) {
+                  if (!printedImages.includes(image.src)) {
                     templateElements.skipImages.appendChild(
-                      createImg(image[0])
+                      createSkipImg(image)
                     );
+                  }
+                }
+
+                const optionImageSrcList = option.option_value.map((v) => v[0]);
+                for (const printedImageSrc of printedImages) {
+                  if (!optionImageSrcList.includes(printedImageSrc)) {
+                    const img =
+                      templateElements.skipFilebirdFolder.querySelector(
+                        `img[src="${printedImageSrc}"]`
+                      );
+                    if (img) {
+                      img.parentNode.removeChild(img);
+                    }
+                  }
+                }
+              }
+              break;
+            case "external_plugin_filebird_ids":
+              let printedFolders = Array.from(
+                templateElements.skipFilebirdFolder.querySelectorAll(".chip")
+              );
+
+              if (printedFolders.length === 0) {
+                templateElements.skipFilebirdFolder.innerHTML = "";
+              }
+              printedFolders = printedFolders.map((v) =>
+                v.getAttribute("data-id")
+              );
+
+              if (Array.isArray(option.option_value)) {
+                // add new folders
+                for (const folder of option.option_value) {
+                  if (!printedFolders.includes(folder.id)) {
+                    templateElements.skipFilebirdFolder.appendChild(
+                      createChip(folder)
+                    );
+                  }
+                }
+                // remove old folders
+                const optionFolderIds = option.option_value.map((v) => v.id);
+                for (const printFolderId of printedFolders) {
+                  if (!optionFolderIds.includes(printFolderId)) {
+                    const chip =
+                      templateElements.skipFilebirdFolder.querySelector(
+                        `.chip[data-id="${printFolderId}"]`
+                      );
+                    if (chip) {
+                      chip.parentNode.removeChild(chip);
+                    }
                   }
                 }
               }
@@ -197,69 +316,110 @@
 
   function pluginAttach() {
     function initFilebird() {
-      function buildCheckboxTree(selectDialog, list) {
-        function addList(parent, list) {
-          const ul = $(
-            '<ul class="jstree-container-ul jstree-children jstree-contextmenu"></ul>'
-          );
-          parent.append(ul);
-
+      let selectedFolderIds = [];
+      function buildCheckboxTree(htmlParent, list) {
+        function translateListData(list) {
+          const resultList = [];
           for (const item of list) {
-            const li = $(`<li 
-              role="treeitem"
-              data-count="6"
-              data-parent="0"
-              real-count="6"
-              style="--color: #8f8f8f"
-              aria-selected="false"
-              aria-level="1"
-              aria-labelledby="1_anchor"
-              id="1"
-              class="jstree-node jstree-leaf ui-droppable"
-            ></li>`);
-            li.html(`${item.name}`);
-            ul.append(li);
-
+            const resultItem = {
+              id: item.id,
+              text: item.name,
+              state: {
+                opened: true,
+                selected: item.selected,
+              },
+              children: [],
+            };
             if (item.children) {
-              addList(li, item.children);
+              resultItem.children = translateListData(item.children);
             }
+            resultList.push(resultItem);
           }
+          return resultList;
         }
-        selectDialog.html("");
-        addList(selectDialog, list);
-      }
 
-      var selectDialog = $(`
-      <div class="m-fpm-media-cleaner">
-        <div class="dialog-content" data-content="">
-          <center>
-            <div class="loading"><div></div><div></div><div></div><div></div></div>
-          </center>
-        </div>
-      </div>
-      `);
-      selectDialog.dialog({
-        title: TRANSLATIONS["Select Filebird Folder"],
-        dialogClass: "wp-dialog wp-core-ui",
-        draggable: false,
-        modal: true,
-        autoOpen: false,
-        closeOnEscape: true,
-        buttons: {
-          Close: function () {
-            $(this).dialog("close");
-          },
-        },
-        open: function (event, ui) {
-          request("media-clean-get-filebird-folders").done(function (response) {
-            buildCheckboxTree(selectDialog, response);
+        htmlParent.html("");
+        const jsTreeData = translateListData(list);
+        htmlParent
+          .on("changed.jstree", function (e, data) {
+            selectedFolderIds = [];
+            for (let i = 0; i < data.selected.length; i++) {
+              selectedFolderIds.push(
+                Number.parseInt(data.instance.get_node(data.selected[i]).id)
+              );
+            }
+          })
+          .jstree({
+            core: {
+              themes: {
+                variant: "large",
+              },
+              data: jsTreeData,
+            },
+            checkbox: {
+              keep_selected_style: false,
+            },
+            plugins: ["wholerow", "checkbox"],
           });
-        },
-      });
+      }
 
       ROOT_DOCUMENT.querySelector(
         "[data-select-filebird-folder]"
       ).addEventListener("click", function () {
+        var selectDialog = $(`<div class="m-fpm-media-cleaner">
+          <div class="dialog-content jstree-filebird" data-content="">
+            <center>
+              ${getLoadingElementString()}
+            </center>
+          </div>
+        </div>`);
+        selectDialog.dialog({
+          title: TRANSLATIONS["Select Filebird Folder"],
+          dialogClass: "wp-dialog wp-core-ui",
+          draggable: false,
+          modal: true,
+          autoOpen: false,
+          closeOnEscape: true,
+          width: 400,
+          buttons: [
+            {
+              // icon: "ui-icon-heart",
+              text: TRANSLATIONS["Close"],
+              click: function () {
+                selectDialog.dialog("close");
+              },
+            },
+            {
+              // icon: "ui-icon-heart",
+              text: TRANSLATIONS["Save"],
+              click: function () {
+                selectDialog.find("[data-content]").html(`<center>
+                  <div class="loading"><div></div><div></div><div></div><div></div></div>
+                </center>`);
+                let ids = selectedFolderIds;
+                if (ids.length === 0) {
+                  ids = false;
+                }
+                request("media-clean-set-filebird-folders", {
+                  ids,
+                }).done(() => {
+                  const template = getTemplateElements();
+                  template.skipFilebirdFolder.innerHTML =
+                    getLoadingElementString();
+                  getOptions();
+                  selectDialog.dialog("close");
+                });
+              },
+            },
+          ],
+          open: function (event, ui) {
+            request("media-clean-get-filebird-folders").done(function (
+              response
+            ) {
+              buildCheckboxTree(selectDialog.find("[data-content]"), response);
+            });
+          },
+        });
         selectDialog.dialog("open");
       });
     }
@@ -294,7 +454,7 @@
     ).addEventListener("click", function () {
       request("media-clean-set-skip", { ids: false }).done(function (response) {
         const template = getTemplateElements();
-        template.skipImages.innerHTML = "";
+        template.skipImages.innerHTML = getLoadingElementString();
         getOptions();
       });
     });

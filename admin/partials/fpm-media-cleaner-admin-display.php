@@ -71,7 +71,7 @@
     <tbody>
       <tr>
         <td colspan="2">
-          <span data-options-skip-image="">
+          <span data-options-skip-image="" class="image-list">
             <div class="loading"><div></div><div></div><div></div><div></div></div>
           </span>
         </td>
@@ -86,12 +86,9 @@
           <th>
             <?php esc_html_e("Skip Filebird Folder", "fpm-media-cleaner"); ?>
           </th>
-          <th style="width:64px;">
+          <th style="width:30px;">
             <button type="button" data-select-filebird-folder="" class="icon">
               <svg fill="white" xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 -960 960 960" width="48"><path d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h279v60H180v600h600v-279h60v279q0 24-18 42t-42 18H180Zm202-219-42-43 398-398H519v-60h321v321h-60v-218L382-339Z"/></svg>
-            </button>
-            <button type="button" data-clear-filebird-folder="" class="icon">
-              <svg fill="white" xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 96 960 960" width="48"><path d="M261 936q-24.75 0-42.375-17.625T201 876V306h-41v-60h188v-30h264v30h188v60h-41v570q0 24-18 42t-42 18H261Zm438-630H261v570h438V306ZM367 790h60V391h-60v399Zm166 0h60V391h-60v399ZM261 306v570-570Z"/></svg>
             </button>
           </th>
         </tr>
@@ -99,9 +96,9 @@
       <tbody>
         <tr>
           <td colspan="2">
-            <span data-options-skip-filebird-folder="">
+            <div data-options-skip-filebird-folder="" class="chip-list">
               <div class="loading"><div></div><div></div><div></div><div></div></div>
-            </span>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -179,6 +176,8 @@
         "Select Filebird Folder",
         "fpm-media-cleaner"
       ),
+      "Close" => __("Close", "fpm-media-cleaner"),
+      "Save" => __("Save", "fpm-media-cleaner"),
     ]); ?>
   </script>
 

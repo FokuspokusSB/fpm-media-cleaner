@@ -88,6 +88,10 @@ class Fpm_Media_Cleaner_Admin
       $this,
       "action_get_filebird_folders",
     ]);
+    add_action("wp_ajax_media-clean-set-filebird-folders", [
+      $this,
+      "action_set_filebird_folders",
+    ]);
   }
 
   private function _set_option($key, $value)
@@ -98,13 +102,40 @@ class Fpm_Media_Cleaner_Admin
     $this->db->query($sql);
   }
 
-  private function _get_options()
+  private function _get_options($key = false)
   {
     $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::OPTIONS_TABLE_NAME;
     $sql = "SELECT * FROM {$table_name}";
     $sql = $this->db->prepare($sql);
     $results = $this->db->get_results($sql);
+
+    if ($key) {
+      foreach ($results as $value) {
+        if ($key == $value->option_key) {
+          return $value;
+        }
+      }
+      return false;
+    }
+
     return $results;
+  }
+
+  private function _get_skip_filebird_folders()
+  {
+    $option_filebird_folder_ids = $this->_get_options(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["EXTERNAL_PLUGIN_FILEBIRD_IDS"]
+    );
+
+    if ($option_filebird_folder_ids) {
+      $option_filebird_folder_ids = json_decode(
+        $option_filebird_folder_ids->option_value
+      );
+      if (!is_array($option_filebird_folder_ids)) {
+        $option_filebird_folder_ids = false;
+      }
+    }
+    return $option_filebird_folder_ids;
   }
 
   public function action_get_filebird_folders()
@@ -117,10 +148,38 @@ class Fpm_Media_Cleaner_Admin
       $fbv_table_name .
       '`
     ';
-    $query_result = $this->db->get_results($SQL, ARRAY_A);
-    $result = buildTree($query_result);
+    $result = $this->db->get_results($SQL, ARRAY_A);
 
+    $option_filebird_folder_ids = $this->_get_skip_filebird_folders();
+
+    if (is_array($option_filebird_folder_ids)) {
+      foreach ($option_filebird_folder_ids as $option_folder_id) {
+        for ($i = 0; $i < sizeof($result); $i++) {
+          if ($result[$i]["id"] === $option_folder_id) {
+            $result[$i]["selected"] = true;
+          }
+        }
+      }
+    }
+
+    $result = buildTree($result);
     echo json_encode($result);
+    wp_die();
+  }
+
+  public function action_set_filebird_folders()
+  {
+    $skip_ids = $_POST["ids"];
+    if (!$skip_ids) {
+      wp_die();
+      return;
+    }
+
+    $this->_set_option(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["EXTERNAL_PLUGIN_FILEBIRD_IDS"],
+      json_encode($skip_ids)
+    );
+    echo json_encode(true);
     wp_die();
   }
 
@@ -136,6 +195,7 @@ class Fpm_Media_Cleaner_Admin
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["SKIP_IDS"],
       json_encode($skip_ids)
     );
+    echo json_encode(true);
     wp_die();
   }
 
@@ -177,12 +237,18 @@ class Fpm_Media_Cleaner_Admin
     $options = $this->_get_options();
 
     $skip_ids_index = false;
+    $filebird_skip_ids_index = false;
     foreach ($options as $i => $option) {
       if (
         $option->option_key == MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["SKIP_IDS"]
       ) {
         $skip_ids_index = $i;
-        break;
+      }
+      if (
+        $option->option_key ==
+        MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["EXTERNAL_PLUGIN_FILEBIRD_IDS"]
+      ) {
+        $filebird_skip_ids_index = $i;
       }
     }
 
@@ -197,12 +263,42 @@ class Fpm_Media_Cleaner_Admin
           $i < sizeof($options[$skip_ids_index]->option_value);
           $i++
         ) {
-          $options[$skip_ids_index]->option_value[
-            $i
-          ] = wp_get_attachment_image_src(
+          $attachment = wp_get_attachment_image_src(
             $options[$skip_ids_index]->option_value[$i]
           );
+          if ($attachment) {
+            $attachment = $attachment[0];
+          }
+          $options[$skip_ids_index]->option_value[$i] = [
+            "src" => $attachment,
+            "id" => $options[$skip_ids_index]->option_value[$i],
+          ];
         }
+      }
+    }
+
+    if ($filebird_skip_ids_index) {
+      $options[$filebird_skip_ids_index]->option_value = json_decode(
+        $options[$filebird_skip_ids_index]->option_value
+      );
+      if (is_array($options[$filebird_skip_ids_index]->option_value)) {
+        $filebird_sql =
+          '
+          SELECT id, name, count(folder_id) as count
+          FROM `' .
+          $this->db->prefix .
+          'fbv` as fb
+          INNER JOIN `' .
+          $this->db->prefix .
+          'fbv_attachment_folder` as f on fb.id = f.folder_id
+          WHERE fb.id in (' .
+          join(",", $options[$filebird_skip_ids_index]->option_value) .
+          ')
+          GROUP BY folder_id
+        ';
+        $options[
+          $filebird_skip_ids_index
+        ]->option_value = $this->db->get_results($filebird_sql, ARRAY_A);
       }
     }
 
@@ -291,14 +387,44 @@ class Fpm_Media_Cleaner_Admin
     );
     $this->_set_option(MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["COUNT"], "0");
 
-    $options = $this->_get_options();
-    $skip_ids = false;
-    if ($options[MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["SKIP_IDS"]]) {
-      $skip_ids = json_encode(
-        $options[MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["SKIP_IDS"]]
-      );
+    $skip_ids = $this->_get_options(
+      MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["SKIP_IDS"]
+    );
+
+    if ($skip_ids) {
+      $skip_ids = json_decode($skip_ids->option_value);
       if (!is_array($skip_ids)) {
         $skip_ids = false;
+      }
+    }
+
+    $skip_folder_ids = $this->_get_skip_filebird_folders();
+    if (is_array($skip_folder_ids)) {
+      $filebird_sql =
+        '
+        SELECT attachment_id
+        FROM `' .
+        $this->db->prefix .
+        'fbv_attachment_folder`
+        WHERE folder_id in (' .
+        join(",", $skip_folder_ids) .
+        ");";
+      $filebird_skipped_ids = $this->db->get_results($filebird_sql, ARRAY_A);
+      for ($i = 0; $i < sizeof($filebird_skipped_ids); $i++) {
+        $filebird_skipped_ids[$i] = $filebird_skipped_ids[$i]["attachment_id"];
+      }
+      if (
+        !is_array($skip_ids) &&
+        is_array($filebird_skipped_ids) &&
+        sizeof($filebird_skipped_ids) > 0
+      ) {
+        $skip_ids = [];
+      }
+      if (
+        is_array($filebird_skipped_ids) &&
+        sizeof($filebird_skipped_ids) > 0
+      ) {
+        $skip_ids = array_merge($skip_ids, $filebird_skipped_ids);
       }
     }
 
@@ -460,7 +586,7 @@ class Fpm_Media_Cleaner_Admin
       "publish_pages",
       "fpm-media-cleaner",
       [$this, "admin_page"],
-      "dashicons-trash"
+      "dashicons-performance"
     );
   }
 
