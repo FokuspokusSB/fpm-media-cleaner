@@ -1,7 +1,5 @@
 .m-fpm-media-cleaner {
   --primary-color: rgb(2, 70, 91);
-  --secondary-color: rgb(53, 183, 199);
-  --warn-color: rgb(254, 99, 51);
   margin-left: -20px;
 }
 .m-fpm-media-cleaner__wrapper {
@@ -23,9 +21,18 @@ table + .m-fpm-media-cleaner__content-title {
   padding: 10px 0;
   position: sticky;
   top: 32px;
+  color: white;
+}
+.m-fpm-media-cleaner__title .m-fpm-media-cleaner__wrapper {
+  display: flex;
+  align-items: center;
 }
 .m-fpm-media-cleaner__title h1 {
   margin: 0;
+  flex: 1 1 auto;
+}
+.m-fpm-media-cleaner__title span {
+  flex: 0 0 auto;
 }
 .m-fpm-media-cleaner__dialog .dialog-content .jstree-node {
   display: flex;

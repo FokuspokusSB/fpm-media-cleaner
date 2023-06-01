@@ -20,7 +20,7 @@
         <?= file_get_contents(FPM_MEDIA_CLEANER_ROOT_DIR . "img/logo.svg") ?>
       </h1>
       <span>
-
+        v.<?= FPM_MEDIA_CLEANER_VERSION ?>
       </span>
     </div>
   </section>

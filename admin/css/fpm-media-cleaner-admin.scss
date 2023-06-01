@@ -1,7 +1,6 @@
 .m-fpm-media-cleaner {
   --primary-color: rgb(2, 70, 91);
-  --secondary-color: rgb(53, 183, 199);
-  --warn-color: rgb(254, 99, 51);
+  $this: &;
   margin-left: -20px;
 
   &__wrapper {
@@ -27,9 +26,20 @@
     padding: 10px 0;
     position: sticky;
     top: 32px;
+    color: white;
+
+    #{$this}__wrapper {
+      display: flex;
+      align-items: center;
+    }
 
     h1 {
       margin: 0;
+      flex: 1 1 auto;
+    }
+
+    span {
+      flex: 0 0 auto;
     }
   }
 
