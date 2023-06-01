@@ -1,7 +1,7 @@
 .m-fpm-media-cleaner {
   --primary-color: rgb(2, 70, 91);
   --secondary-color: rgb(53, 183, 199);
-  --tertiary-color: rgb(254, 99, 51);
+  --warn-color: rgb(254, 99, 51);
   margin-left: -20px;
 }
 .m-fpm-media-cleaner__wrapper {
@@ -21,12 +21,28 @@ table + .m-fpm-media-cleaner__content-title {
   display: inline-block;
   width: 100%;
   padding: 10px 0;
+  position: sticky;
+  top: 32px;
 }
 .m-fpm-media-cleaner__title h1 {
   margin: 0;
 }
-.m-fpm-media-cleaner__history tfoot td:last-child {
-  padding: 20px 0 20px 20px;
+.m-fpm-media-cleaner__dialog .dialog-content .jstree-node {
+  display: flex;
+  flex-wrap: wrap;
+}
+.m-fpm-media-cleaner__dialog .dialog-content .jstree-wholerow {
+  width: 40px;
+}
+.m-fpm-media-cleaner__dialog .dialog-content .jstree-children {
+  width: 100%;
+}
+.m-fpm-media-cleaner th {
+  font-weight: bold;
+}
+.m-fpm-media-cleaner tfoot td:last-child {
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 .m-fpm-media-cleaner .btn {
   background-color: transparent;
@@ -42,17 +58,26 @@ table + .m-fpm-media-cleaner__content-title {
 .m-fpm-media-cleaner .btn:hover {
   cursor: pointer;
 }
-.m-fpm-media-cleaner .controls {
-  padding: 20px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.m-fpm-media-cleaner table + table {
+  margin-top: 10px;
 }
-.m-fpm-media-cleaner .controls button {
-  margin-left: 10px;
+.m-fpm-media-cleaner table table {
+  border: 0;
 }
-.m-fpm-media-cleaner .controls button:first-child {
-  margin-left: 0;
+.m-fpm-media-cleaner__cache-table img {
+  object-fit: contain;
+  width: 40px;
+  height: 40px;
+}
+.m-fpm-media-cleaner .button-warn {
+  background: #dc4848;
+  border-color: #dc4848;
+  color: #fff;
+}
+.m-fpm-media-cleaner .button-warn:hover {
+  color: #fff;
+  background: #ca2727;
+  border-color: #ca2727;
 }
 .m-fpm-media-cleaner .progressbar {
   display: none;
@@ -64,16 +89,6 @@ table + .m-fpm-media-cleaner__content-title {
 .m-fpm-media-cleaner .progressbar progress {
   width: 100%;
 }
-.m-fpm-media-cleaner .dialog-content .jstree-node {
-  display: flex;
-  flex-wrap: wrap;
-}
-.m-fpm-media-cleaner .dialog-content .jstree-wholerow {
-  width: 40px;
-}
-.m-fpm-media-cleaner .dialog-content .jstree-children {
-  width: 100%;
-}
 .m-fpm-media-cleaner .chip-list {
   margin-left: -10px;
 }
@@ -81,47 +96,60 @@ table + .m-fpm-media-cleaner__content-title {
   margin-left: 10px;
 }
 .m-fpm-media-cleaner .image-list {
-  margin-left: -10px;
-}
-.m-fpm-media-cleaner .image-list .skip-image {
-  margin-left: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
 }
 .m-fpm-media-cleaner .skip-image {
   position: relative;
   display: inline-block;
-  width: auto;
+  height: 60px;
+  width: 60px;
 }
-.m-fpm-media-cleaner .skip-image .remove {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 5;
+.m-fpm-media-cleaner .skip-image img {
+  object-fit: cover;
   width: 100%;
   height: 100%;
+}
+.m-fpm-media-cleaner .skip-image .remove {
+  --size: 20px;
+  background-color: var(--primary-color);
+  border: 0;
+  width: var(--size);
+  height: var(--size);
+  position: absolute;
+  top: calc(var(--size) / 2 * -1);
+  right: calc(var(--size) / 2 * -1);
+  z-index: 5;
+  padding: 0;
+  border-radius: 100%;
   color: white;
-  display: flex;
   justify-content: center;
   align-items: center;
-  opacity: 0;
+  display: none;
+}
+.m-fpm-media-cleaner .skip-image .remove::after {
+  content: "x";
+  font-size: calc(var(--size) - 2px);
 }
 .m-fpm-media-cleaner .skip-image img {
   vertical-align: middle;
 }
 .m-fpm-media-cleaner .skip-image:hover .remove {
-  opacity: 0.7;
+  display: flex;
 }
 .m-fpm-media-cleaner .chip {
-  background-color: var(--secondary-color);
-  color: white;
+  background-color: #f6f7f7;
   display: inline-flex;
   justify-content: center;
   gap: 5px;
   padding: 5px 10px;
 }
+.m-fpm-media-cleaner .chip i {
+  color: #8f8f8f;
+}
 .m-fpm-media-cleaner .chip .count {
-  background-color: var(--primary-color);
+  background-color: #8f8f8f;
   color: white;
   height: 20px;
   width: 20px;

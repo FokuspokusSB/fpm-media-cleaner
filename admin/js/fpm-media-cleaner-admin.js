@@ -92,7 +92,6 @@
     });
     removeElement.classList.add("remove");
     const icon = document.createElement("i");
-    icon.className = "wp-menu-image dashicons-before dashicons-trash";
     removeElement.appendChild(icon);
     skipImage.appendChild(removeElement);
     return skipImage;
@@ -297,14 +296,11 @@
 
           for (const row of response) {
             const tr = document.createElement("tr");
+            const modified = new Date(row.post_modified);
             tr.appendChild(createDataTableTd(row.id));
             tr.appendChild(createDataTableTd(createImg(row.img[0])));
-            // tr.appendChild(createDataTableTd(row.img[0]));
-            const modified = new Date(row.post_modified);
             tr.appendChild(createDataTableTd(row.post_title));
-            const lastTd = createDataTableTd(formatDate(modified));
-            lastTd.setAttribute("colspan", "2");
-            tr.appendChild(lastTd);
+            tr.appendChild(createDataTableTd(formatDate(modified)));
             tbody.appendChild(tr);
           }
         }
@@ -366,7 +362,7 @@
       ROOT_DOCUMENT.querySelector(
         "[data-select-filebird-folder]"
       ).addEventListener("click", function () {
-        var selectDialog = $(`<div class="m-fpm-media-cleaner">
+        var selectDialog = $(`<div class="m-fpm-media-cleaner__dialog">
           <div class="dialog-content jstree-filebird" data-content="">
             <center>
               ${getLoadingElementString()}
@@ -445,7 +441,9 @@
       "[data-fpm-media-cleaner-refresh]"
     ).addEventListener("click", function () {
       request("media-clean-fill-cache", {})
-        .done(function (response) {})
+        .done(function (response) {
+          getCacheTable();
+        })
         .fail(function () {});
       setTimeout(() => getOptions(), 500);
     });
