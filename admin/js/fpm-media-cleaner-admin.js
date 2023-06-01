@@ -2,6 +2,7 @@
   "use strict";
   let ROOT_DOCUMENT;
   let TRANSLATIONS;
+  let TEMPLATE_ELEMENTS;
 
   function log(msg, type = "log") {
     console[type](`----------------------------------`);
@@ -54,14 +55,14 @@
         "[data-options-skip-filebird-folder]"
       ),
 
-      progress: ROOT_DOCUMENT.querySelector("[data-fpm-media-progress]"),
-      refreshBtn: ROOT_DOCUMENT.querySelector(
-        "[data-fpm-media-cleaner-refresh]"
-      ),
-      purgeBtn: ROOT_DOCUMENT.querySelector("[data-fpm-media-cleaner-remove]"),
-      activeCount: ROOT_DOCUMENT.querySelector(
-        "[data-fpm-media-cleaner-count]"
-      ),
+      progress: ROOT_DOCUMENT.querySelector("[data-progress]"),
+      refreshBtn: ROOT_DOCUMENT.querySelector("[data-fill-cache]"),
+      purgeBtn: ROOT_DOCUMENT.querySelector("[data-remove-images]"),
+      activeCount: ROOT_DOCUMENT.querySelector("[data-count]"),
+
+      cacheTable: ROOT_DOCUMENT.querySelector("[data-clean-media]"),
+      cacheTotal: ROOT_DOCUMENT.querySelector("[data-cache-total]"),
+      cachePagination: ROOT_DOCUMENT.querySelector("[data-cache-pagination]"),
     };
   }
 
@@ -98,8 +99,7 @@
   }
 
   function removeSingleSkipImage(id) {
-    const templateElements = getTemplateElements();
-    let ids = templateElements.skipImages.getAttribute("data-ids");
+    let ids = TEMPLATE_ELEMENTS.skipImages.getAttribute("data-ids");
     if (!ids) {
       return;
     }
@@ -117,8 +117,7 @@
         ids = false;
       }
       request("media-clean-set-skip", { ids }).done(function (response) {
-        const template = getTemplateElements();
-        template.skipImages.innerHTML = "";
+        TEMPLATE_ELEMENTS.skipImages.innerHTML = getLoadingElementString();
         getOptions();
       });
     }
@@ -143,20 +142,48 @@
     return chip;
   }
 
+  function clickPageCacheTable() {
+    const page = this.getAttribute("data-page");
+    TEMPLATE_ELEMENTS.cacheTable.setAttribute("data-page", page);
+    getCacheTable();
+  }
+  function setPaginationElements() {
+    const total =
+      TEMPLATE_ELEMENTS.cacheTable.getAttribute("data-total") || "0";
+    const limit = TEMPLATE_ELEMENTS.cacheTable.getAttribute("data-limit");
+    const activePage = TEMPLATE_ELEMENTS.cacheTable.getAttribute("data-page");
+    const pages = Math.ceil(total / limit);
+    const ul = TEMPLATE_ELEMENTS.cachePagination;
+    ul.innerHTML = "";
+
+    for (let page = 1; page <= pages; page++) {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      if (activePage == page) {
+        btn.classList.add("active");
+      }
+      btn.setAttribute("data-page", page);
+      btn.innerHTML = page;
+      btn.addEventListener("click", clickPageCacheTable);
+      li.appendChild(btn);
+      ul.appendChild(li);
+    }
+    console.log(pages);
+  }
+
   function getCount() {
-    const elements = getTemplateElements();
     request("media-clean-get-count", {})
       .done(function (response) {
-        elements.activeCount.innerHTML = response.count;
-        const allCounts = Number.parseInt(elements.count.innerHTML);
+        TEMPLATE_ELEMENTS.activeCount.innerHTML = response.count;
+        const allCounts = Number.parseInt(TEMPLATE_ELEMENTS.count.innerHTML);
         const count = Number.parseInt(response);
 
         if (!Number.isNaN(allCounts) && !Number.isNaN(count)) {
-          elements.progress.setAttribute("max", allCounts);
-          elements.progress.setAttribute("value", allCounts - count);
+          TEMPLATE_ELEMENTS.progress.setAttribute("max", allCounts);
+          TEMPLATE_ELEMENTS.progress.setAttribute("value", allCounts - count);
         } else {
-          elements.progress.removeAttribute("max");
-          elements.progress.removeAttribute("value");
+          TEMPLATE_ELEMENTS.progress.removeAttribute("max");
+          TEMPLATE_ELEMENTS.progress.removeAttribute("value");
         }
       })
       .fail(function () {
@@ -165,50 +192,49 @@
   }
 
   function getOptions() {
-    const templateElements = getTemplateElements();
-
     request("media-clean-get-options", {})
       .done(function (response) {
         for (const option of response) {
           switch (option.option_key) {
             case "status":
-              templateElements.status.innerHTML = option.option_value;
+              TEMPLATE_ELEMENTS.status.innerHTML =
+                TRANSLATIONS["STATUS"][option.option_value];
               if (option.option_value.startsWith("process")) {
-                templateElements.progress.parentNode.classList.add("show");
-                templateElements.refreshBtn.setAttribute("disabled", "");
-                templateElements.purgeBtn.setAttribute("disabled", "");
+                TEMPLATE_ELEMENTS.progress.parentNode.classList.add("show");
+                TEMPLATE_ELEMENTS.refreshBtn.setAttribute("disabled", "");
+                TEMPLATE_ELEMENTS.purgeBtn.setAttribute("disabled", "");
               }
               if (option.option_value.startsWith("finish")) {
-                templateElements.progress.parentNode.classList.remove("show");
-                templateElements.refreshBtn.removeAttribute("disabled");
-                templateElements.purgeBtn.removeAttribute("disabled");
+                TEMPLATE_ELEMENTS.progress.parentNode.classList.remove("show");
+                TEMPLATE_ELEMENTS.refreshBtn.removeAttribute("disabled");
+                TEMPLATE_ELEMENTS.purgeBtn.removeAttribute("disabled");
               }
               break;
             case "last_update":
               const date = new Date(option.option_value);
-              templateElements.lastUpdate.innerHTML = formatDate(date);
+              TEMPLATE_ELEMENTS.lastUpdate.innerHTML = formatDate(date);
               break;
             case "count":
-              templateElements.count.innerHTML = option.option_value;
+              TEMPLATE_ELEMENTS.count.innerHTML = option.option_value;
               break;
 
             case "skip_ids":
               let printedImages = Array.from(
-                templateElements.skipImages.querySelectorAll("img")
+                TEMPLATE_ELEMENTS.skipImages.querySelectorAll("img")
               );
 
               if (printedImages.length === 0) {
-                templateElements.skipImages.innerHTML = "";
+                TEMPLATE_ELEMENTS.skipImages.innerHTML = "";
               }
               printedImages = printedImages.map((v) => v.src);
               if (Array.isArray(option.option_value)) {
-                templateElements.skipImages.setAttribute(
+                TEMPLATE_ELEMENTS.skipImages.setAttribute(
                   "data-ids",
                   JSON.stringify(option.option_value)
                 );
                 for (const image of option.option_value) {
                   if (!printedImages.includes(image.src)) {
-                    templateElements.skipImages.appendChild(
+                    TEMPLATE_ELEMENTS.skipImages.appendChild(
                       createSkipImg(image)
                     );
                   }
@@ -218,7 +244,7 @@
                 for (const printedImageSrc of printedImages) {
                   if (!optionImageSrcList.includes(printedImageSrc)) {
                     const img =
-                      templateElements.skipFilebirdFolder.querySelector(
+                      TEMPLATE_ELEMENTS.skipFilebirdFolder.querySelector(
                         `img[src="${printedImageSrc}"]`
                       );
                     if (img) {
@@ -230,11 +256,11 @@
               break;
             case "external_plugin_filebird_ids":
               let printedFolders = Array.from(
-                templateElements.skipFilebirdFolder.querySelectorAll(".chip")
+                TEMPLATE_ELEMENTS.skipFilebirdFolder.querySelectorAll(".chip")
               );
 
               if (printedFolders.length === 0) {
-                templateElements.skipFilebirdFolder.innerHTML = "";
+                TEMPLATE_ELEMENTS.skipFilebirdFolder.innerHTML = "";
               }
               printedFolders = printedFolders.map((v) =>
                 v.getAttribute("data-id")
@@ -244,7 +270,7 @@
                 // add new folders
                 for (const folder of option.option_value) {
                   if (!printedFolders.includes(folder.id)) {
-                    templateElements.skipFilebirdFolder.appendChild(
+                    TEMPLATE_ELEMENTS.skipFilebirdFolder.appendChild(
                       createChip(folder)
                     );
                   }
@@ -254,7 +280,7 @@
                 for (const printFolderId of printedFolders) {
                   if (!optionFolderIds.includes(printFolderId)) {
                     const chip =
-                      templateElements.skipFilebirdFolder.querySelector(
+                      TEMPLATE_ELEMENTS.skipFilebirdFolder.querySelector(
                         `.chip[data-id="${printFolderId}"]`
                       );
                     if (chip) {
@@ -273,18 +299,29 @@
   }
 
   function getCacheTable() {
-    const table = ROOT_DOCUMENT.querySelector("[data-clean-media]");
+    const table = TEMPLATE_ELEMENTS.cacheTable;
     if (!table) {
       return alert("Fehler");
     }
     table.classList.add("is-loading");
+    TEMPLATE_ELEMENTS.cacheTotal.innerHTML = getLoadingElementString();
+    const page = table.getAttribute("data-page") || 1;
+    const limit = table.getAttribute("data-limit") || 20;
 
-    request("media-clean-get-cache", {})
+    request("media-clean-get-cache", { page, limit })
       .done(function (response) {
+        if (!response.data) {
+          return;
+        }
+        TEMPLATE_ELEMENTS.cacheTotal.innerHTML = response.total;
+        table.setAttribute("data-total", response.total);
+        setPaginationElements();
+
+        const data = response.data;
         table.classList.remove("is-loading");
         const tbody = table.querySelector("tbody");
         tbody.innerHTML = "";
-        if (response.length === 0) {
+        if (data.length === 0) {
           table.classList.remove("fill");
           const tr = document.createElement("tr");
           const td = createDataTableTd(TRANSLATIONS["No data available."]);
@@ -294,16 +331,20 @@
         } else {
           table.classList.add("fill");
 
-          for (const row of response) {
+          for (const row of data) {
             const tr = document.createElement("tr");
             const modified = new Date(row.post_modified);
             tr.appendChild(createDataTableTd(row.id));
-            tr.appendChild(createDataTableTd(createImg(row.img[0])));
+            const imgTd = createDataTableTd(createImg(row.img[0]));
+            imgTd.classList.add("column-primary");
+            tr.appendChild(imgTd);
             tr.appendChild(createDataTableTd(row.post_title));
             tr.appendChild(createDataTableTd(formatDate(modified)));
             tbody.appendChild(tr);
           }
         }
+
+        // TODO: add pagination
       })
       .fail(function () {
         console.error("error");
@@ -334,7 +375,7 @@
           return resultList;
         }
 
-        htmlParent.html("");
+        htmlParent.html(getLoadingElementString());
         const jsTreeData = translateListData(list);
         htmlParent
           .on("changed.jstree", function (e, data) {
@@ -399,8 +440,7 @@
                 request("media-clean-set-filebird-folders", {
                   ids,
                 }).done(() => {
-                  const template = getTemplateElements();
-                  template.skipFilebirdFolder.innerHTML =
+                  TEMPLATE_ELEMENTS.skipFilebirdFolder.innerHTML =
                     getLoadingElementString();
                   getOptions();
                   selectDialog.dialog("close");
@@ -437,9 +477,12 @@
     getCacheTable();
     pluginAttach();
 
-    ROOT_DOCUMENT.querySelector(
-      "[data-fpm-media-cleaner-refresh]"
-    ).addEventListener("click", function () {
+    TEMPLATE_ELEMENTS.refreshBtn.addEventListener("click", function () {
+      const table = ROOT_DOCUMENT.querySelector("[data-clean-media]");
+      if (table) {
+        table.classList.add("is-loading");
+      }
+
       request("media-clean-fill-cache", {})
         .done(function (response) {
           getCacheTable();
@@ -447,36 +490,41 @@
         .fail(function () {});
       setTimeout(() => getOptions(), 500);
     });
-    ROOT_DOCUMENT.querySelector(
-      "[data-fpm-media-cleaner-clear-skip]"
-    ).addEventListener("click", function () {
-      request("media-clean-set-skip", { ids: false }).done(function (response) {
-        const template = getTemplateElements();
-        template.skipImages.innerHTML = getLoadingElementString();
-        getOptions();
-      });
-    });
-    ROOT_DOCUMENT.querySelector(
-      "[data-fpm-media-cleaner-remove]"
-    ).addEventListener("click", function () {
-      const answer = confirm(
-        TRANSLATIONS["Do you want to delete the pictures?"]
-      );
-      if (answer) {
-        request("media-clean-remove", {})
-          .done(function (response) {})
-          .fail(function () {
-            console.error("error");
-          });
-        setTimeout(() => getOptions(), 500);
-      }
-    });
-    ROOT_DOCUMENT.querySelector("[data-refresh-cash]").addEventListener(
+    ROOT_DOCUMENT.querySelector("[data-clear-skip]").addEventListener(
       "click",
       function () {
-        getCacheTable();
+        request("media-clean-set-skip", { ids: false }).done(function (
+          response
+        ) {
+          TEMPLATE_ELEMENTS.skipImages.innerHTML = getLoadingElementString();
+          getOptions();
+        });
       }
     );
+    ROOT_DOCUMENT.querySelector("[data-remove-images]").addEventListener(
+      "click",
+      function () {
+        const answer = confirm(
+          TRANSLATIONS["Do you want to delete the pictures?"]
+        );
+        if (answer) {
+          request("media-clean-remove", {})
+            .done(function (response) {
+              getCacheTable();
+            })
+            .fail(function () {
+              console.error("error");
+            });
+          setTimeout(() => getOptions(), 500);
+        }
+      }
+    );
+    // ROOT_DOCUMENT.querySelector("[data-refresh-cash]").addEventListener(
+    //   "click",
+    //   function () {
+    //     getCacheTable();
+    //   }
+    // );
 
     ROOT_DOCUMENT.querySelector("[data-add-skip-images]").addEventListener(
       "click",
@@ -513,6 +561,7 @@
     } catch (e) {
       log(e.message, "error");
     }
+    TEMPLATE_ELEMENTS = getTemplateElements();
 
     initPanel();
   });

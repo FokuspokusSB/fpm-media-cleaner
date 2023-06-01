@@ -138,6 +138,19 @@ class Fpm_Media_Cleaner_Admin
     return $option_filebird_folder_ids;
   }
 
+  private function _get_param($key, $fallback_value)
+  {
+    $value = $fallback_value;
+    if (
+      array_key_exists($key, $_POST) &&
+      $_POST[$key] &&
+      !empty($_POST[$key])
+    ) {
+      $value = $_POST[$key];
+    }
+    return $value;
+  }
+
   public function action_get_filebird_folders()
   {
     $fbv_table_name = $this->db->prefix . "fbv";
@@ -207,6 +220,11 @@ class Fpm_Media_Cleaner_Admin
 
   public function action_get_cache()
   {
+    $page = $this->_get_param("page", 1);
+    $limit = $this->_get_param("limit", 20);
+
+    $offset = ($page - 1) * $limit;
+
     $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
     $post_table_name = $this->db->prefix . "posts";
     $SQL =
@@ -219,15 +237,23 @@ class Fpm_Media_Cleaner_Admin
       $post_table_name .
       '` as p ON fpm.post_id = p.ID
       ORDER BY fpm.ID
-      LIMIT 100
-    ';
+      LIMIT ' .
+      $offset .
+      ", " .
+      $limit;
     $result = $this->db->get_results($SQL, ARRAY_A);
+
+    $COUNT_SQL = "SELECT COUNT(*) as total FROM `" . $table_name . "`;";
+    $total = $this->db->get_row($COUNT_SQL, ARRAY_A);
 
     for ($i = 0; $i < sizeof($result); $i++) {
       $result[$i]["img"] = wp_get_attachment_image_src($result[$i]["post_id"]);
     }
 
-    echo json_encode($result);
+    echo json_encode([
+      "data" => $result,
+      "total" => $total["total"],
+    ]);
 
     wp_die();
   }
@@ -324,7 +350,7 @@ class Fpm_Media_Cleaner_Admin
   {
     $this->_set_option(
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["STATUS"],
-      "process-remove"
+      MEDIA_CLEANER_CONFIG::STATUS_VALUES["process-remove"]
     );
     $this->_set_option(
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
@@ -347,7 +373,7 @@ class Fpm_Media_Cleaner_Admin
 
     $this->_set_option(
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["STATUS"],
-      "finish-remove"
+      MEDIA_CLEANER_CONFIG::STATUS_VALUES["finish-remove"]
     );
     $this->_set_option(
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
@@ -379,7 +405,7 @@ class Fpm_Media_Cleaner_Admin
   {
     $this->_set_option(
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["STATUS"],
-      "process-cache"
+      MEDIA_CLEANER_CONFIG::STATUS_VALUES["process-cache"]
     );
     $this->_set_option(
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["LAST_UPDATE"],
@@ -505,7 +531,7 @@ class Fpm_Media_Cleaner_Admin
 
     $this->_set_option(
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["STATUS"],
-      "finish-cache"
+      MEDIA_CLEANER_CONFIG::STATUS_VALUES["finish-cache"]
     );
 
     $this->_set_option(

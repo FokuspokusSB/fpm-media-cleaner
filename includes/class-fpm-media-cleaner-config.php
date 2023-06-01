@@ -12,4 +12,11 @@ class MEDIA_CLEANER_CONFIG
     "SKIP_IDS" => "skip_ids",
     "EXTERNAL_PLUGIN_FILEBIRD_IDS" => "external_plugin_filebird_ids",
   ];
+
+  const STATUS_VALUES = [
+    "process-remove" => "process-remove",
+    "finish-remove" => "finish-remove",
+    "process-cache" => "process-cache",
+    "finish-cache" => "finish-cache",
+  ];
 }

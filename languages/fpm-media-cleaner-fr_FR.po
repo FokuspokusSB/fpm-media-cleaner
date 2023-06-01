@@ -5,11 +5,11 @@ msgstr ""
 "Project-Id-Version: FPM Media Cleaner 1.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/fpm-media-"
 "cleaner\n"
-"POT-Creation-Date: 2023-05-31T14:05:42+00:00\n"
-"PO-Revision-Date: 2023-05-31 16:14+0200\n"
+"POT-Creation-Date: 2023-06-01T15:38:04+00:00\n"
+"PO-Revision-Date: 2023-06-01 17:52+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: fr_FR\n"
+"Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,9 +17,8 @@ msgstr ""
 "X-Domain: fpm-media-cleaner\n"
 
 #. Plugin Name of the plugin
-#: admin/partials/fpm-media-cleaner-admin-display.php:18
-msgid "FPM Media Cleaner"
-msgstr ""
+msgid "Media Cleaner"
+msgstr "Media Cleaner"
 
 #. Plugin URI of the plugin
 #. Author URI of the plugin
@@ -28,89 +27,205 @@ msgstr ""
 
 #. Description of the plugin
 msgid "Removed unnecessary Media Files"
-msgstr ""
+msgstr "Löscht ungebrauchte Bilder aus der Mediathek"
 
 #. Author of the plugin
 msgid "Sören Balke"
 msgstr ""
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:24
+#: admin/partials/fpm-media-cleaner-admin-display.php:33
+msgid "Verlauf"
+msgstr "Verlauf"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:40
 msgid "Status"
-msgstr "Statut"
+msgstr "Status"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:27
-msgid "Last Update"
-msgstr "Dernière mise à jour"
+#: admin/partials/fpm-media-cleaner-admin-display.php:43
+msgid "Letzte Aktualisierung"
+msgstr "Letzte Aktualisierung"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:30
-msgid "Last Update Count"
-msgstr "Nombre de dernières mises à jour"
+#: admin/partials/fpm-media-cleaner-admin-display.php:49
+msgid "Anzahl der zuletzt gelöschten Bilder"
+msgstr "Anzahl der zuletzt gelöschten Bilder"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:59
-msgid "Skip Images"
-msgstr "Ignorer les images"
+#: admin/partials/fpm-media-cleaner-admin-display.php:55
+msgid "Log"
+msgstr "Log"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:87
-msgid "Skip Filebird Folder"
+#: admin/partials/fpm-media-cleaner-admin-display.php:79
+msgid "Log ansehen"
+msgstr "Log ansehen"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:92
+msgid "Verlauf leeren"
+msgstr "Verlauf leeren"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:100
+msgid "Mediathek aufräumen"
+msgstr "Mediathek aufräumen"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:107
+msgid "Ausnahmen festlegen"
+msgstr "Ausnahmen festlegen"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:114
+msgid ""
+"Optional: Wählen Sie Bilder/Dateien aus, die nicht gelöscht werden sollen, "
+"unabhängig von ihrer Benutzung."
 msgstr ""
+"Optional: Wählen Sie Bilder/Dateien aus, die nicht gelöscht werden sollen, "
+"unabhängig von ihrer Benutzung."
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:112
-msgid "Fill/Update Cache Table"
-msgstr "Remplir/Mettre à jour la table de cache"
-
-#: admin/partials/fpm-media-cleaner-admin-display.php:116
-msgid "Delete Media Files"
-msgstr "Supprimer les fichiers multimédias"
-
-#: admin/partials/fpm-media-cleaner-admin-display.php:121
-msgid "Current Count:"
-msgstr "Nombre actuel:"
+#: admin/partials/fpm-media-cleaner-admin-display.php:133
+msgid "Ausnahmen aus Meditahek auswählen"
+msgstr "Ausnahmen aus Meditahek auswählen"
 
 #: admin/partials/fpm-media-cleaner-admin-display.php:139
+msgid "Auswahl entfernen"
+msgstr "Auswahl entfernen"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:154
+msgid "Filebird-Ordner als Ausnahmen festlegen"
+msgstr "Filebird-Ordner als Ausnahmen festlegen"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:164
+msgid ""
+"Sie haben das Filebird-Plugin aktiviert. Hier können Sie optional auch "
+"Ordner festlegen, deren Inhalt nicht gelöscht werden soll, unabhängig von "
+"der Benutzung."
+msgstr ""
+"Sie haben das Filebird-Plugin aktiviert. Hier können Sie optional auch "
+"Ordner festlegen, deren Inhalt nicht gelöscht werden soll, unabhängig von "
+"der Benutzung."
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:187
+msgid "Ordner aus Meditahek auswählen/bearbeiten"
+msgstr "Ordner aus Meditahek auswählen/bearbeiten"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:202
+#: admin/partials/fpm-media-cleaner-admin-display.php:222
+msgid "Mediathek analysieren"
+msgstr "Mediathek analysieren"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:212
+msgid ""
+"Klicken auf den Button um deine Mediathek nach ungenutzten Dateien zu "
+"durchsuchen. Wiederhole diesen Schritt wenn du neue Ausnahmen ob hinzufügst. "
+"Je nach umfang der Mediathek kann dieser Prozess etwas Zeit in Anspruch "
+"nehmen."
+msgstr ""
+"Klicken auf den Button um deine Mediathek nach ungenutzten Dateien zu "
+"durchsuchen. Wiederhole diesen Schritt wenn du neue Ausnahmen ob hinzufügst. "
+"Je nach umfang der Mediathek kann dieser Prozess etwas Zeit in Anspruch "
+"nehmen."
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:228
+msgid "Ungenutzte Dateien gefunden:"
+msgstr "Ungenutzte Dateien gefunden:"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:254
 msgid "ID"
 msgstr "ID"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:142
-msgid "Image"
+#: admin/partials/fpm-media-cleaner-admin-display.php:257
+msgid "Bild"
 msgstr "Bild"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:145
-msgid "Title"
-msgstr "Titre"
+#: admin/partials/fpm-media-cleaner-admin-display.php:260
+msgid "Titel"
+msgstr "Titel"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:148
-msgid "Updated on"
-msgstr "Mis à jour le"
+#: admin/partials/fpm-media-cleaner-admin-display.php:263
+msgid "Aktualisiert am"
+msgstr "Aktualisiert am"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:168
-#, fuzzy
-#| msgid "Skip Images"
+#: admin/partials/fpm-media-cleaner-admin-display.php:295
+msgid ""
+"Klicke auf den Button um deine Mediathek zu bereinigen und ungenutzte Bilder "
+"zu entfernen."
+msgstr ""
+"Klicke auf den Button um deine Mediathek zu bereinigen und ungenutzte Bilder "
+"zu entfernen."
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:307
+msgid "Delete Media Files"
+msgstr "Mediendateien löschenDelete Media Files"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:310
+msgid "Noch zu löschende Dateien:"
+msgstr "Noch zu löschende Dateien:"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:336
 msgid "Skip Images Select"
-msgstr "Ignorer les images"
+msgstr "Bilder überspringen"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:169
+#: admin/partials/fpm-media-cleaner-admin-display.php:337
 msgid "select"
-msgstr "sélectionner"
+msgstr "auswahl"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:170
+#: admin/partials/fpm-media-cleaner-admin-display.php:338
 msgid "Do you want to delete the pictures?"
-msgstr "Voulez-vous supprimer les images ?"
+msgstr "Möchtest du die Bilder löschen?"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:174
+#: admin/partials/fpm-media-cleaner-admin-display.php:342
 msgid "No data available."
-msgstr "Pas de données disponibles."
+msgstr "Keine Daten verfügbar."
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:175
+#: admin/partials/fpm-media-cleaner-admin-display.php:343
 msgid "Select Filebird Folder"
-msgstr "Sélectionnez le dossier Filebird"
+msgstr "Wähle Fildbird Order"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:179
+#: admin/partials/fpm-media-cleaner-admin-display.php:347
 msgid "Close"
-msgstr "Fermer"
+msgstr "Schließen"
 
-#: admin/partials/fpm-media-cleaner-admin-display.php:180
+#: admin/partials/fpm-media-cleaner-admin-display.php:348
 msgid "Save"
-msgstr "Sauvegarder"
+msgstr "Speichern"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:351
+msgid "process-remove"
+msgstr "Löschungsprozess"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:352
+msgid "finish-remove"
+msgstr "Löschen abgeschlossen"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:353
+msgid "process-cache"
+msgstr "Cache Prozess"
+
+#: admin/partials/fpm-media-cleaner-admin-display.php:354
+msgid "finish-cache"
+msgstr "Cache abgeschlossen"
+
+#~ msgid "Last Update"
+#~ msgstr "Letzte Aktualisierung"
+
+#~ msgid "Last Update Count"
+#~ msgstr "Anzahl der letzten Aktualisierungen"
+
+#~ msgid "Skip Images"
+#~ msgstr "Bilder überspringen"
+
+#~ msgid "Skip Filebird Folder"
+#~ msgstr "Überspringe Filebird Order"
+
+#~ msgid "Fill/Update Cache Table"
+#~ msgstr "Cache-Tabelle füllen/aktualisieren"
+
+#~ msgid "Current Count:"
+#~ msgstr "Aktuelle Anzahl:"
+
+#~ msgid "Image"
+#~ msgstr "Bild"
+
+#~ msgid "Title"
+#~ msgstr "Titel"
+
+#~ msgid "Updated on"
+#~ msgstr "Aktualisiert am"
 
 #~ msgid "Select Skip Images"
-#~ msgstr "Sélectionner les images à ignorer"
+#~ msgstr "Bilder zum Überspringen auswählen"

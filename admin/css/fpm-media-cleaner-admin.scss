@@ -1,23 +1,55 @@
 .m-fpm-media-cleaner {
-  --primary-color: rgb(2, 70, 91);
   $this: &;
+  --primary-color: rgb(2, 70, 91);
+  box-sizing: border-box;
   margin-left: -20px;
 
+  * {
+    box-sizing: inherit;
+  }
+
   &__wrapper {
-    padding: 0 40px;
+    padding: 0 20px;
   }
 
   &__content {
     padding: 40px 0;
 
     &-title {
-      margin: 0 0 10px 0;
+      margin: 0;
+      padding: 0 0 10px 0;
+      min-height: 30px;
     }
 
     table + &-title {
       margin-top: 40px;
     }
+
+    #{$this}__wrapper {
+      display: flex;
+      gap: 20px;
+    }
+
+    @media only screen and (max-width: 960px) {
+      #{$this}__wrapper {
+        display: block;
+      }
+    }
   }
+
+  // &__app {
+  //   flex: 80%;
+  // }
+
+  &__side-bar {
+    display: none;
+    flex: 20%;
+    padding-top: 30px;
+  }
+  @media only screen and (max-width: 960px) {
+  }
+
+  // &__
 
   &__title {
     background-color: var(--primary-color);
@@ -25,6 +57,7 @@
     width: 100%;
     padding: 10px 0;
     position: sticky;
+    z-index: 100;
     top: 32px;
     color: white;
 
@@ -41,6 +74,14 @@
     span {
       flex: 0 0 auto;
     }
+
+    @media screen and (max-width: 782px) {
+      top: 46px;
+    }
+    @media screen and (max-width: 600px) {
+      position: relative;
+      top: 0;
+    }
   }
 
   &__dialog {
@@ -56,6 +97,56 @@
 
       .jstree-children {
         width: 100%;
+      }
+    }
+  }
+
+  &__cache-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  &__pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+
+    li {
+      margin-bottom: 0;
+    }
+
+    button {
+      background-color: #c5c6c9;
+      border: 1px solid #c5c6c9;
+      border-radius: 2px;
+      color: #fff;
+
+      width: 27px;
+      height: 27px;
+      padding: 0;
+
+      &:hover,
+      &.active {
+        background-color: #787878;
+        border-color: #787878;
+      }
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  &__footer {
+    &-controls {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+
+      button.button-warn {
+        padding: 12px 60px;
       }
     }
   }
@@ -89,12 +180,24 @@
     }
   }
 
+  table {
+    &.is-loading {
+      tbody {
+        opacity: 0.4;
+      }
+    }
+  }
+
   table + table {
     margin-top: 10px;
   }
 
   table table {
     border: 0;
+
+    th {
+      border-top: 1px solid #c3c4c7;
+    }
   }
 
   &__cache-table {
@@ -131,11 +234,9 @@
   }
 
   .chip-list {
-    margin-left: -10px;
-
-    .chip {
-      margin-left: 10px;
-    }
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   .image-list {
