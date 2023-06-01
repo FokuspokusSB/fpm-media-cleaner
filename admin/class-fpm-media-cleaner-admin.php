@@ -581,12 +581,15 @@ class Fpm_Media_Cleaner_Admin
   public function admin_menu()
   {
     add_menu_page(
-      "FPM Media Cleaner",
-      "FPM Media Cleaner",
+      "Media Cleaner",
+      "Media Cleaner",
       "publish_pages",
       "fpm-media-cleaner",
       [$this, "admin_page"],
-      "dashicons-performance"
+      "data:image/svg+xml;base64," .
+        base64_encode(
+          file_get_contents(FPM_MEDIA_CLEANER_ROOT_DIR . "img/icon.svg")
+        )
     );
   }
 
