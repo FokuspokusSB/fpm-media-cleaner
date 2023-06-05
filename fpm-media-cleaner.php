@@ -9,7 +9,7 @@
  * that starts the plugin.
  *
  * @link              https://fokuspokus-media.de
- * @since             1.0.3
+ * @since             1.0.0
  * @package           Fpm_Media_Cleaner
  *
  * @wordpress-plugin
@@ -19,7 +19,7 @@
  * Version:           1.0.3
  * Author:            Sören Balke
  * Author URI:        https://fokuspokus-media.de
- * License:           Copyright
+ * License:           GPLv2 or later
  * Text Domain:       fpm-media-cleaner
  * Domain Path:       /languages
  */
