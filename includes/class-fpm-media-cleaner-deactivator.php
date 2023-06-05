@@ -38,6 +38,7 @@ class Fpm_Media_Cleaner_Deactivator
     $table_name = $wpdb->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
     $table_options_name =
       $wpdb->prefix . MEDIA_CLEANER_CONFIG::OPTIONS_TABLE_NAME;
+    $table_log_name = $wpdb->prefix . MEDIA_CLEANER_CONFIG::LOG_TABLE_NAME;
 
     $wpdb->query(
       '
@@ -49,6 +50,12 @@ class Fpm_Media_Cleaner_Deactivator
       '
 			DROP TABLE `' .
         $table_options_name .
+        "`"
+    );
+    $wpdb->query(
+      '
+			DROP TABLE `' .
+        $table_log_name .
         "`"
     );
   }

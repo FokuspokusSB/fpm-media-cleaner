@@ -55,10 +55,16 @@
         "[data-options-skip-filebird-folder]"
       ),
 
+      logTbody: ROOT_DOCUMENT.querySelector("[data-log-items]"),
+      resetLog: ROOT_DOCUMENT.querySelector("[data-reset-log]"),
+
       progress: ROOT_DOCUMENT.querySelector("[data-progress]"),
-      refreshBtn: ROOT_DOCUMENT.querySelector("[data-fill-cache]"),
-      purgeBtn: ROOT_DOCUMENT.querySelector("[data-remove-images]"),
       activeCount: ROOT_DOCUMENT.querySelector("[data-count]"),
+
+      purgeBtn: ROOT_DOCUMENT.querySelector("[data-remove-images]"),
+      refreshBtn: ROOT_DOCUMENT.querySelector("[data-fill-cache]"),
+      zipMediaBtn: ROOT_DOCUMENT.querySelector("[data-media-zip]"),
+      getZipMediaBtn: ROOT_DOCUMENT.querySelector("[data-get-media-zip]"),
 
       cacheTable: ROOT_DOCUMENT.querySelector("[data-clean-media]"),
       cacheTotal: ROOT_DOCUMENT.querySelector("[data-cache-total]"),
@@ -66,7 +72,7 @@
     };
   }
 
-  function createDataTableTd(value) {
+  function createTableTd(value) {
     const td = document.createElement("td");
     if (typeof value === "string") {
       td.innerHTML = value;
@@ -78,7 +84,9 @@
 
   function createImg(value) {
     const img = document.createElement("img");
-    img.src = value;
+    if (value) {
+      img.src = value;
+    }
     return img;
   }
 
@@ -168,7 +176,6 @@
       li.appendChild(btn);
       ul.appendChild(li);
     }
-    console.log(pages);
   }
 
   function getCount() {
@@ -189,6 +196,40 @@
       .fail(function () {
         console.error("error");
       });
+  }
+
+  function getLog() {
+    function setBtnClick(btn, log) {
+      btn.innerHTML = `<i class="dashicons-before dashicons-editor-ul"></i>${TRANSLATIONS["Log ansehen"]}`;
+      btn.addEventListener("click", function () {
+        alert(log);
+      });
+      btn.className = "btn icon";
+    }
+    TEMPLATE_ELEMENTS.logTbody.innerHTML = `<tr>
+      <td colspan="4">
+        ${getLoadingElementString()}
+      </td>
+    </tr>`;
+
+    request("media-clean-get-log", {}).done(function (response) {
+      if (Array.isArray(response)) {
+        TEMPLATE_ELEMENTS.logTbody.innerHTML = "";
+        for (const item of response) {
+          const tr = document.createElement("tr");
+          const date = new Date(item.insert_date);
+          const btn = document.createElement("button");
+          setBtnClick(btn, item.log);
+
+          tr.append(createTableTd(TRANSLATIONS["STATUS"][item.status]));
+          tr.append(createTableTd(formatDate(date)));
+          tr.append(createTableTd(item.count));
+          tr.append(createTableTd(btn));
+
+          TEMPLATE_ELEMENTS.logTbody.append(tr);
+        }
+      }
+    });
   }
 
   function getOptions() {
@@ -324,7 +365,7 @@
         if (data.length === 0) {
           table.classList.remove("fill");
           const tr = document.createElement("tr");
-          const td = createDataTableTd(TRANSLATIONS["No data available."]);
+          const td = createTableTd(TRANSLATIONS["No data available."]);
           td.setAttribute("colspan", table.querySelectorAll("th").length);
           tr.appendChild(td);
           tbody.appendChild(tr);
@@ -334,12 +375,12 @@
           for (const row of data) {
             const tr = document.createElement("tr");
             const modified = new Date(row.post_modified);
-            tr.appendChild(createDataTableTd(row.id));
-            const imgTd = createDataTableTd(createImg(row.img[0]));
+            tr.appendChild(createTableTd(row.id));
+            const imgTd = createTableTd(createImg(row.img[0] || ""));
             imgTd.classList.add("column-primary");
             tr.appendChild(imgTd);
-            tr.appendChild(createDataTableTd(row.post_title));
-            tr.appendChild(createDataTableTd(formatDate(modified)));
+            tr.appendChild(createTableTd(row.post_title));
+            tr.appendChild(createTableTd(formatDate(modified)));
             tbody.appendChild(tr);
           }
         }
@@ -466,15 +507,12 @@
   }
 
   function initPanel() {
-    if (!ROOT_DOCUMENT) {
-      return;
-    }
-
     setInterval(getCount, 5000);
     setInterval(getOptions, 5000);
     getCount();
     getOptions();
     getCacheTable();
+    getLog();
     pluginAttach();
 
     TEMPLATE_ELEMENTS.refreshBtn.addEventListener("click", function () {
@@ -490,6 +528,7 @@
         .fail(function () {});
       setTimeout(() => getOptions(), 500);
     });
+
     ROOT_DOCUMENT.querySelector("[data-clear-skip]").addEventListener(
       "click",
       function () {
@@ -501,6 +540,7 @@
         });
       }
     );
+
     ROOT_DOCUMENT.querySelector("[data-remove-images]").addEventListener(
       "click",
       function () {
@@ -519,12 +559,6 @@
         }
       }
     );
-    // ROOT_DOCUMENT.querySelector("[data-refresh-cash]").addEventListener(
-    //   "click",
-    //   function () {
-    //     getCacheTable();
-    //   }
-    // );
 
     ROOT_DOCUMENT.querySelector("[data-add-skip-images]").addEventListener(
       "click",
@@ -549,11 +583,96 @@
         mediaWindow.open();
       }
     );
+
+    TEMPLATE_ELEMENTS.zipMediaBtn.addEventListener("click", function () {
+      TEMPLATE_ELEMENTS.zipMediaBtn.setAttribute("disabled", "disabled");
+      const text = TEMPLATE_ELEMENTS.zipMediaBtn.innerHTML;
+      TEMPLATE_ELEMENTS.zipMediaBtn.innerHTML = getLoadingElementString();
+      request("media-clean-zip").done(function (response) {
+        TEMPLATE_ELEMENTS.zipMediaBtn.removeAttribute("disabled");
+        TEMPLATE_ELEMENTS.zipMediaBtn.innerHTML = text;
+      });
+    });
+
+    TEMPLATE_ELEMENTS.getZipMediaBtn.addEventListener("click", function () {
+      var selectDialog = $(`<div class="m-fpm-media-cleaner__dialog">
+          <div class="dialog-content" data-content="">
+            <center>
+              ${getLoadingElementString()}
+            </center>
+          </div>
+        </div>`);
+      selectDialog.dialog({
+        title: TRANSLATIONS["Auswahl Zip Export"],
+        dialogClass: "wp-dialog wp-core-ui",
+        draggable: false,
+        modal: true,
+        autoOpen: false,
+        closeOnEscape: true,
+        width: 400,
+        buttons: [
+          {
+            text: TRANSLATIONS["Close"],
+            click: function () {
+              selectDialog.dialog("close");
+            },
+          },
+        ],
+        open: function (event, ui) {
+          request("media-clean-get-zip").done(function (response) {
+            if (Array.isArray(response)) {
+              const content = selectDialog.find("[data-content]");
+              content.html("");
+              for (const exportZip of response) {
+                const row = $(`
+                  <p>
+                    <a href="${exportZip.url}" target="_blank">
+                      ${exportZip.filename}
+                      <span style="display: inline-block; width: 100%;">${formatDate(
+                        new Date(Number.parseInt(exportZip.date) * 1000)
+                      )}</span>
+                    </a>
+                    <button data-remove-zip="">
+                      Remove
+                    </button>
+                  </p>
+                `);
+                row.find("[data-remove-zip]").on("click", function () {
+                  request("media-clean-remove-zip", {
+                    zip: exportZip.filename,
+                  }).done(function () {
+                    row.remove();
+                  });
+                });
+                content.append(row);
+              }
+            }
+          });
+        },
+      });
+      selectDialog.dialog("open");
+    });
+
+    TEMPLATE_ELEMENTS.resetLog.addEventListener("click", function () {
+      const answer = confirm(
+        TRANSLATIONS["Möchtest du alle Logeinträge löschen?"]
+      );
+      if (!answer) {
+        return;
+      }
+      request("media-clean-reset-log").done(function (response) {
+        TEMPLATE_ELEMENTS.logTbody.innerHTML = "";
+      });
+    });
   }
 
   $(function () {
     // fill global vars
     ROOT_DOCUMENT = document.querySelector("[data-fpm-media-cleaner]");
+    if (!ROOT_DOCUMENT) {
+      return;
+    }
+
     try {
       TRANSLATIONS = JSON.parse(
         ROOT_DOCUMENT.querySelector("[data-js-translations]").innerHTML
