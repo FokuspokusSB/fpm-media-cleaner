@@ -66,6 +66,12 @@ table + .m-fpm-media-cleaner__content-title {
     top: 0;
   }
 }
+.m-fpm-media-cleaner__dialog .dialog-content a {
+  text-decoration: none;
+}
+.m-fpm-media-cleaner__dialog .dialog-content a:hover {
+  text-decoration: underline;
+}
 .m-fpm-media-cleaner__dialog .dialog-content .jstree-node {
   display: flex;
   flex-wrap: wrap;
@@ -76,41 +82,20 @@ table + .m-fpm-media-cleaner__content-title {
 .m-fpm-media-cleaner__dialog .dialog-content .jstree-children {
   width: 100%;
 }
-.m-fpm-media-cleaner__dialog .loading {
-  display: inline-block;
-  position: relative;
-  width: 80px;
-  height: 15px;
+.m-fpm-media-cleaner__dialog .dialog-content .split-row {
+  display: flex;
+  margin-bottom: 10px;
 }
-.m-fpm-media-cleaner__dialog .loading div {
-  position: absolute;
-  top: 0;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: #000;
-  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+.m-fpm-media-cleaner__dialog .dialog-content .split-row .large {
+  flex: 1 1 auto;
 }
-.m-fpm-media-cleaner__dialog .loading div:nth-child(1) {
-  left: 8px;
-  animation: lds-ellipsis1 0.6s infinite;
-}
-.m-fpm-media-cleaner__dialog .loading div:nth-child(2) {
-  left: 8px;
-  animation: lds-ellipsis2 0.6s infinite;
-}
-.m-fpm-media-cleaner__dialog .loading div:nth-child(3) {
-  left: 32px;
-  animation: lds-ellipsis2 0.6s infinite;
-}
-.m-fpm-media-cleaner__dialog .loading div:nth-child(4) {
-  left: 56px;
-  animation: lds-ellipsis3 0.6s infinite;
+.m-fpm-media-cleaner__dialog .dialog-content .split-row .small {
+  flex: 0 0 auto;
 }
 .m-fpm-media-cleaner__cache-controls {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 5px;
   flex-wrap: wrap;
 }
 .m-fpm-media-cleaner__pagination {
@@ -152,20 +137,6 @@ table + .m-fpm-media-cleaner__content-title {
 .m-fpm-media-cleaner tfoot td:last-child {
   padding-top: 20px;
   padding-bottom: 20px;
-}
-.m-fpm-media-cleaner .btn {
-  background-color: transparent;
-  border: 0;
-}
-.m-fpm-media-cleaner .btn.icon {
-  display: flex;
-  align-items: center;
-}
-.m-fpm-media-cleaner .btn.icon i {
-  margin-right: 7px;
-}
-.m-fpm-media-cleaner .btn:hover {
-  cursor: pointer;
 }
 .m-fpm-media-cleaner table.is-loading tbody {
   opacity: 0.4;
@@ -272,13 +243,34 @@ table + .m-fpm-media-cleaner__content-title {
   justify-content: center;
   align-items: center;
 }
-.m-fpm-media-cleaner .loading {
+.m-fpm-media-cleaner .button.icon .dashicons-before::before, .m-fpm-media-cleaner__dialog .button.icon .dashicons-before::before {
+  vertical-align: sub;
+}
+.m-fpm-media-cleaner .btn, .m-fpm-media-cleaner__dialog .btn {
+  background-color: transparent;
+  border: 1px solid transparent;
+}
+.m-fpm-media-cleaner .btn:hover, .m-fpm-media-cleaner__dialog .btn:hover {
+  background-color: #cccccc;
+  border-color: #cccccc;
+}
+.m-fpm-media-cleaner .btn.icon, .m-fpm-media-cleaner__dialog .btn.icon {
+  display: flex;
+  align-items: center;
+}
+.m-fpm-media-cleaner .btn.icon i, .m-fpm-media-cleaner__dialog .btn.icon i {
+  margin-right: 7px;
+}
+.m-fpm-media-cleaner .btn:hover, .m-fpm-media-cleaner__dialog .btn:hover {
+  cursor: pointer;
+}
+.m-fpm-media-cleaner .loading, .m-fpm-media-cleaner__dialog .loading {
   display: inline-block;
   position: relative;
   width: 80px;
   height: 15px;
 }
-.m-fpm-media-cleaner .loading div {
+.m-fpm-media-cleaner .loading div, .m-fpm-media-cleaner__dialog .loading div {
   position: absolute;
   top: 0;
   width: 13px;
@@ -287,22 +279,23 @@ table + .m-fpm-media-cleaner__content-title {
   background: #000;
   animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
-.m-fpm-media-cleaner .loading div:nth-child(1) {
+.m-fpm-media-cleaner .loading div:nth-child(1), .m-fpm-media-cleaner__dialog .loading div:nth-child(1) {
   left: 8px;
   animation: lds-ellipsis1 0.6s infinite;
 }
-.m-fpm-media-cleaner .loading div:nth-child(2) {
+.m-fpm-media-cleaner .loading div:nth-child(2), .m-fpm-media-cleaner__dialog .loading div:nth-child(2) {
   left: 8px;
   animation: lds-ellipsis2 0.6s infinite;
 }
-.m-fpm-media-cleaner .loading div:nth-child(3) {
+.m-fpm-media-cleaner .loading div:nth-child(3), .m-fpm-media-cleaner__dialog .loading div:nth-child(3) {
   left: 32px;
   animation: lds-ellipsis2 0.6s infinite;
 }
-.m-fpm-media-cleaner .loading div:nth-child(4) {
+.m-fpm-media-cleaner .loading div:nth-child(4), .m-fpm-media-cleaner__dialog .loading div:nth-child(4) {
   left: 56px;
   animation: lds-ellipsis3 0.6s infinite;
 }
+
 @keyframes lds-ellipsis1 {
   0% {
     transform: scale(0);

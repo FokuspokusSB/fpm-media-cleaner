@@ -625,17 +625,21 @@
               content.html("");
               for (const exportZip of response) {
                 const row = $(`
-                  <p>
-                    <a href="${exportZip.url}" target="_blank">
-                      ${exportZip.filename}
-                      <span style="display: inline-block; width: 100%;">${formatDate(
-                        new Date(Number.parseInt(exportZip.date) * 1000)
-                      )}</span>
-                    </a>
-                    <button data-remove-zip="">
-                      Remove
-                    </button>
-                  </p>
+                  <div class="split-row">
+                    <div class="large">
+                      <a href="${exportZip.url}" target="_blank">
+                        ${exportZip.filename}
+                        <span style="display: inline-block; width: 100%;">${formatDate(
+                          new Date(Number.parseInt(exportZip.date) * 1000)
+                        )}</span>
+                      </a>
+                    </div>
+                    <div class="small">
+                      <button data-remove-zip="" class="button icon">
+                        <i class="dashicons-before dashicons-trash"></i>
+                      </button>
+                    </div>
+                  </div>
                 `);
                 row.find("[data-remove-zip]").on("click", function () {
                   request("media-clean-remove-zip", {

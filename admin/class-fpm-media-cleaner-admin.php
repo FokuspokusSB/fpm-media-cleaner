@@ -115,11 +115,16 @@ class Fpm_Media_Cleaner_Admin
 
   private function _get_log()
   {
+    $format_log = function ($v) {
+      $v["insert_date"] = $v["insert_date"] . "+00:00";
+      return $v;
+    };
+
     $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::LOG_TABLE_NAME;
     $sql = "SELECT * FROM {$table_name} ORDER BY ID DESC";
     $sql = $this->db->prepare($sql);
     $results = $this->db->get_results($sql, ARRAY_A);
-    return $results;
+    return array_map($format_log, $results);
   }
 
   private function _set_log($status, $log, $count = 0)
@@ -733,12 +738,6 @@ class Fpm_Media_Cleaner_Admin
     $this->_set_option(
       MEDIA_CLEANER_CONFIG::OPTIONS_KEYS["COUNT"],
       $this->_get_count()
-    );
-
-    $this->_set_log(
-      MEDIA_CLEANER_CONFIG::STATUS_VALUES["finish-cache"],
-      $log,
-      sizeof($log)
     );
   }
 
