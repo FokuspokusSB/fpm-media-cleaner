@@ -163,6 +163,11 @@ class Fpm_Media_Cleaner
       $this->get_version()
     );
 
+    $this->loader->add_filter(
+      "plugin_action_links_fpm-media-cleaner/fpm-media-cleaner.php",
+      "add_plugin_links"
+    );
+
     $this->loader->add_action(
       "admin_enqueue_scripts",
       $plugin_admin,

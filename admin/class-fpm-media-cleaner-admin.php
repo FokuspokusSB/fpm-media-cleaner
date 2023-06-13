@@ -741,6 +741,22 @@ class Fpm_Media_Cleaner_Admin
     );
   }
 
+  public function add_plugin_links($links)
+  {
+    // $url = esc_url(
+    //   add_query_arg(
+    //     "page",
+    //     "nelio-content-settings",
+    //     get_admin_url() . "admin.php"
+    //   )
+    // );
+    // // Create the link.
+    // $settings_link = "<a href='$url'>" . __("Settings") . "</a>";
+    // // Adds the link to the end of the array.
+    // array_push($links, $settings_link);
+    return $links;
+  }
+
   /**
    * Register the stylesheets for the admin area.
    *
