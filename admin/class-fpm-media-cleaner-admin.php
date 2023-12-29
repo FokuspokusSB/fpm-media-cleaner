@@ -322,9 +322,7 @@ class Fpm_Media_Cleaner_Admin
           ')
           GROUP BY folder_id
         ';
-        $options[
-          $filebird_skip_ids_index
-        ]->option_value = $this->db->get_results($filebird_sql, ARRAY_A);
+        $options[$filebird_skip_ids_index]->option_value = $this->db->get_results($filebird_sql, ARRAY_A);
       }
     }
 
@@ -504,16 +502,25 @@ class Fpm_Media_Cleaner_Admin
         FROM wp_posts
         WHERE post_content like '%{$attachment["ID"]}%'
       ";
+      $SQL_SEARCH_IN_POST_META = " 
+        SELECT meta_value 
+        FROM wp_postmeta
+        WHERE meta_value like '%{$attachment["ID"]}%'
+      ";
       $post_content_result = $this->db->get_results(
         $SQL_SEARCH_IN_POST_CONTENT
       );
       $options_content_result = $this->db->get_results(
         $SQL_SEARCH_IN_OPTION_CONTENT
       );
+      $post_meta_content_result = $this->db->get_results(
+        $SQL_SEARCH_IN_POST_META
+      );
 
       if (
         sizeof($post_content_result) == 0 &&
-        sizeof($options_content_result) == 0
+        sizeof($options_content_result) == 0 &&
+        sizeof($post_meta_content_result) == 0
       ) {
         // is not in post_content
         // $attachment["guid"] = str_replace(
