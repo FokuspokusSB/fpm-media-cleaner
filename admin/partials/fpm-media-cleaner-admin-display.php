@@ -74,12 +74,15 @@
                 </span>
               </td>
               <td>
-                <button type="button" class="btn icon" disabled="">
+                <!-- <button type="button" class="btn icon" disabled="">
                   <i class="dashicons-before dashicons-editor-ul"></i>
                   <?php esc_html_e("Log ansehen", "fpm-media-cleaner"); ?>
-                </button>
+                </button> -->
               </td>
             </tr>
+          </tbody>
+
+          <tbody data-log-items="">
           </tbody>
           
           <tfoot>
@@ -88,7 +91,11 @@
               </td>
               <td class="column-primary">
                 <!-- text-align: right -->
-                <button class="button-primary" type="button" disabled="">
+                <button 
+                  class="button-primary" 
+                  type="button" 
+                  data-reset-log=""
+                >
                   <?php esc_html_e("Verlauf leeren", "fpm-media-cleaner"); ?>
                 </button>
               </td>
@@ -224,6 +231,26 @@
                       "fpm-media-cleaner"
                     ); ?>
                   </button>
+                  <button 
+                    type="button" 
+                    data-media-zip="" 
+                    class="button button-primary"
+                  >
+                    <?php esc_html_e(
+                      "erstelle ZIP Datei",
+                      "fpm-media-cleaner"
+                    ); ?>
+                  </button>
+                  <button 
+                    type="button" 
+                    data-get-media-zip=""
+                    class="button button-secondary"
+                  >
+                    <?php esc_html_e(
+                      "zeige alle ZIP Dateien",
+                      "fpm-media-cleaner"
+                    ); ?>
+                  </button>
                   <span>
                     <?php esc_html_e(
                       "Ungenutzte Dateien gefunden:",
@@ -321,8 +348,7 @@
       </div>
 
       <div class="m-fpm-media-cleaner__side-bar">
-        <div style="height: 300px; background: red;">
-
+        <div style="height: 300px; background: white;">
         </div>
       </div>
 
@@ -339,15 +365,22 @@
         "Do you want to delete the pictures?",
         "fpm-media-cleaner"
       ),
+      "Möchtest du alle Logeinträge löschen?" => __(
+        "Möchtest du alle Logeinträge löschen?",
+        "fpm-media-cleaner"
+      ),
       "No data available." => __("No data available.", "fpm-media-cleaner"),
       "Select Filebird Folder" => __(
         "Select Filebird Folder",
         "fpm-media-cleaner"
       ),
+      "Auswahl Zip Export" => __("Auswahl Zip Export", "fpm-media-cleaner"),
       "Close" => __("Close", "fpm-media-cleaner"),
       "Save" => __("Save", "fpm-media-cleaner"),
+      "Log ansehen" => __("Log ansehen", "fpm-media-cleaner"),
 
       "STATUS" => [
+        "init" => __("init", "fpm-media-cleaner"),
         "process-remove" => __("process-remove", "fpm-media-cleaner"),
         "finish-remove" => __("finish-remove", "fpm-media-cleaner"),
         "process-cache" => __("process-cache", "fpm-media-cleaner"),
