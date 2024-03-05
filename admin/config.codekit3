@@ -7,7 +7,7 @@
       "uuidString" : "1A18E57C-76A2-48E2-9C29-9BB406917B91"
     }
   ],
-  "creatorBuild" : "34484",
+  "creatorBuild" : "34518",
   "files" : {
     "\/class-fpm-media-cleaner-admin.php" : {
       "cB" : 0,
@@ -988,9 +988,6 @@
       "no-return-assign" : {
         "active" : 0,
         "optionString" : "'except-parens'"
-      },
-      "no-return-await" : {
-        "active" : 0
       },
       "no-script-url" : {
         "active" : 0
