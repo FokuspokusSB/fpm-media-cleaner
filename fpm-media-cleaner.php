@@ -16,7 +16,7 @@
  * Plugin Name:       Media Cleaner
  * Plugin URI:        https://fokuspokus-media.de
  * Description:       Removed unnecessary Media Files
- * Version:           1.0.3
+ * Version:           1.0.4
  * Author:            Sören Balke
  * Author URI:        https://fokuspokus-media.de
  * License:           GPLv2 or later

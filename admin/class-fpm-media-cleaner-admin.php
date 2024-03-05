@@ -59,6 +59,7 @@ class Fpm_Media_Cleaner_Admin
    */
   private $version;
 
+  private $db;
   /**
    * Initialize the class and set its properties.
    *
@@ -262,6 +263,7 @@ class Fpm_Media_Cleaner_Admin
   public function action_fill_cache()
   {
     $this->_refill_cache_table();
+    echo json_encode(true);
     wp_die();
   }
 
@@ -394,9 +396,7 @@ class Fpm_Media_Cleaner_Admin
           ')
           GROUP BY folder_id
         ';
-        $options[
-          $filebird_skip_ids_index
-        ]->option_value = $this->db->get_results($filebird_sql, ARRAY_A);
+        $options[$filebird_skip_ids_index]->option_value = $this->db->get_results($filebird_sql, ARRAY_A);
       }
     }
 
@@ -544,6 +544,7 @@ class Fpm_Media_Cleaner_Admin
       date("c")
     );
     $table_name = $this->db->prefix . MEDIA_CLEANER_CONFIG::TABLE_NAME;
+    // $post_table_name = $this->db->prefix . "posts";
     $SQL =
       '
       SELECT id, post_id
@@ -685,8 +686,8 @@ class Fpm_Media_Cleaner_Admin
       $SQL_NOT_DIRECT_LINKED,
       ARRAY_A
     );
-    $attachment_not_link = [];
-    $place_holders = [];
+    // $attachment_not_link = [];
+    // $place_holders = [];
 
     $log = [];
     foreach ($attachments_not_direct_link as $key => $attachment) {
@@ -703,16 +704,41 @@ class Fpm_Media_Cleaner_Admin
         FROM wp_posts
         WHERE post_content like '%{$attachment["ID"]}%'
       ";
+      $SQL_SEARCH_IN_POST_META = " 
+        SELECT pm.meta_value as meta_value
+        FROM wp_postmeta as pm, wp_posts as p
+        WHERE pm.post_id = p.ID
+        AND meta_value like '%{$attachment["ID"]}%' 
+        AND p.post_type != 'revision'
+      ";
       $post_content_result = $this->db->get_results(
         $SQL_SEARCH_IN_POST_CONTENT
       );
       $options_content_result = $this->db->get_results(
         $SQL_SEARCH_IN_OPTION_CONTENT
       );
+      $post_meta_content_result = $this->db->get_results(
+        $SQL_SEARCH_IN_POST_META,
+        ARRAY_A
+      );
+
+      if (sizeof($post_meta_content_result) > 0) {
+        $tmp = [];
+        foreach ($post_meta_content_result as $row) {
+          if (
+            $row['meta_value'] != $attachment["ID"] &&
+            strpos($row['meta_value'], "\"" . $attachment["ID"] . "\"") !== false
+          ) {
+            $tmp[] = $row;
+          }
+        }
+        $post_meta_content_result = $tmp;
+      }
 
       if (
         sizeof($post_content_result) == 0 &&
-        sizeof($options_content_result) == 0
+        sizeof($options_content_result) == 0 &&
+        sizeof($post_meta_content_result) == 0
       ) {
         $this->db->insert($table_name, [
           "post_id" => $attachment["ID"],
